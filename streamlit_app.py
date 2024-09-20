@@ -112,3 +112,7 @@ if page == "Leads":
 
   # Display the graph
   st.plotly_chart(graph_evolucao_leads)
+
+  # Display pivotable with data
+  st.write("Pivotable com dados")
+  st.write(groupby_leads_por_unidade_dia_pivot)
