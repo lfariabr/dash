@@ -63,10 +63,8 @@ if page == "Leads":
       y='ID do lead',
       title='Número de Leads por loja',
       labels={'ID do lead': 'Número de Leads', 'Unidade': 'Unidade'},
-      markers=True  # Adiciona marcadores nos pontos da linha
   )
-  st.write("TESTE")
+
   # Display the graph
   st.plotly_chart(graph_por_loja)
 
-  st.write("TESTE2")
