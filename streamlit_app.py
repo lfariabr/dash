@@ -37,11 +37,17 @@ if page == "Leads":
   # Filter data for SP units
   df_leads_total = df_leads
 
+  # Gráficos
   # Group by dia do mês and count unique leads
   groupby_leads_dia_do_mes = df_leads.groupby('apenas_o_dia').agg({'ID do lead': 'nunique'}).reset_index()
   groupby_leads_por_unidade = df_leads.groupby('Unidade').agg({'ID do lead': 'nunique'}).reset_index()
   groupby_leads_por_fonte = df_leads.groupby('Fonte').agg({'ID do lead': 'nunique'}).reset_index()
   groupby_leads_por_status = df_leads.groupby('Status').agg({'ID do lead': 'nunique'}).reset_index()
+
+  # Tabela
+  # Groupby unidade por dia / loja pivotado
+  groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'apenas_o_dia']).agg({'ID do lead': 'nunique'}).reset_index()
+  groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='apenas_o_dia', values='ID do lead')
 
   st.write("Número de leads por dia")
 
@@ -92,3 +98,7 @@ if page == "Leads":
 
   # Display the graph
   st.plotly_chart(graph_por_status)
+
+  # Display pivotable with data
+  st.write("Pivotable com dados")
+  st.write(groupby_leads_por_unidade_dia_pivot)
