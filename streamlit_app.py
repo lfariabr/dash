@@ -96,9 +96,16 @@ if page == "Leads":
       labels={'ID do lead': 'Número de Leads', 'Status': 'Status'},
   )
 
-  # Display the graph
-  st.plotly_chart(graph_por_status)
+  # Create a heatmap for leads by day of the month and unit
+  heatmap = px.imshow(
+    groupby_leads_por_unidade_dia_pivot,
+    labels={'color': 'Número de Leads'},
+    x=groupby_leads_por_unidade_dia_pivot.columns,
+    y=groupby_leads_por_unidade_dia_pivot.index,
+    title='Leads por Unidade e Dia do Mês',
+    aspect='auto',
+    color_continuous_scale='Viridis'  # Escolha uma escala de cor que preferir
+  )
 
-  # Display pivotable with data
-  st.write("Pivotable com dados")
-  st.write(groupby_leads_por_unidade_dia_pivot)
+  # Display the heatmap
+  st.plotly_chart(heatmap)
