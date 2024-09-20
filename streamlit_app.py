@@ -92,7 +92,7 @@ if page == "Leads":
         labels={'ID do lead': 'Número de Leads', 'Fonte': 'Fonte'},
     )
 
-  with col3:
+  with col4:
     # Display the graph
     st.plotly_chart(graph_por_fonte)
 
