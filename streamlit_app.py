@@ -10,9 +10,13 @@ import streamlit as st
 import pandas as pd # novo 3
 import plotly.express as px
 
-if page == "Graphics":
+st.sidebar.title("Navigation") # Novo
+page = st.sidebar.selectbox("Choose a page", ["Leads"]) # Novo
 
-  st.title("Graphics!")
+
+if page == "Leads":
+
+  st.title("Leads!")
 
   leads = 'leads.xlsx'
   df_leads = pd.read_excel(leads)
