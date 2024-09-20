@@ -49,52 +49,56 @@ if page == "Leads":
   groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'apenas_o_dia']).agg({'ID do lead': 'nunique'}).reset_index()
   groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='apenas_o_dia', values='ID do lead')
 
-  st.write("Número de leads por dia")
+  # Dividindo a tela em duas colunas
+  col1, col2 = st.columns(2)
+  with col1:
+    st.write("Número de leads por dia")
 
-  # Create line graph for leads by day of the month
-  graph_dia_do_mes = px.line(
-      groupby_leads_dia_do_mes,
-      x='apenas_o_dia',
-      y='ID do lead',
-      title='Número de Leads por apenas_o_dia',
-      labels={'ID do lead': 'Número de Leads', 'apenas_o_dia': 'Dia do mês'},
-      markers=True  # Adiciona marcadores nos pontos da linha
-  )
-  # Display the graph
-  st.plotly_chart(graph_dia_do_mes)
+    # Create line graph for leads by day of the month
+    graph_dia_do_mes = px.line(
+        groupby_leads_dia_do_mes,
+        x='apenas_o_dia',
+        y='ID do lead',
+        title='Número de Leads por apenas_o_dia',
+        labels={'ID do lead': 'Número de Leads', 'apenas_o_dia': 'Dia do mês'},
+        markers=True  # Adiciona marcadores nos pontos da linha
+    )
+    # Display the graph
+    st.plotly_chart(graph_dia_do_mes)
 
-  # Create bar graph for leads by day of the month
-  graph_por_loja = px.bar(
-      groupby_leads_por_unidade,
-      x='Unidade',
-      y='ID do lead',
-      title='Número de Leads por loja',
-      labels={'ID do lead': 'Número de Leads', 'Unidade': 'Unidade'},
-  )
+    # Create bar graph for leads by day of the month
+    graph_por_loja = px.bar(
+        groupby_leads_por_unidade,
+        x='Unidade',
+        y='ID do lead',
+        title='Número de Leads por loja',
+        labels={'ID do lead': 'Número de Leads', 'Unidade': 'Unidade'},
+    )
 
-  # Display the graph
-  st.plotly_chart(graph_por_loja)
+  with col2:
+    # Display the graph
+    st.plotly_chart(graph_por_loja)
 
-  # Create pizza chart for leads per font
-  graph_por_fonte = px.pie(
-      groupby_leads_por_fonte,
-      names='Fonte',
-      values='ID do lead',
-      title='Número de Leads por Fonte',
-      labels={'ID do lead': 'Número de Leads', 'Fonte': 'Fonte'},
-  )
+    # Create pizza chart for leads per font
+    graph_por_fonte = px.pie(
+        groupby_leads_por_fonte,
+        names='Fonte',
+        values='ID do lead',
+        title='Número de Leads por Fonte',
+        labels={'ID do lead': 'Número de Leads', 'Fonte': 'Fonte'},
+    )
 
-  # Display the graph
-  st.plotly_chart(graph_por_fonte)
+    # Display the graph
+    st.plotly_chart(graph_por_fonte)
 
-  # Create pizza graph for leads per status
-  graph_por_status = px.pie(
-      groupby_leads_por_status,
-      names='Status',
-      values='ID do lead',
-      title='Número de Leads por Status',
-      labels={'ID do lead': 'Número de Leads', 'Status': 'Status'},
-  )
+    # Create pizza graph for leads per status
+    graph_por_status = px.pie(
+        groupby_leads_por_status,
+        names='Status',
+        values='ID do lead',
+        title='Número de Leads por Status',
+        labels={'ID do lead': 'Número de Leads', 'Status': 'Status'},
+    )
 
   # Reset index for better plotly interaction
   df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia do mês', value_name='Número de Leads')
