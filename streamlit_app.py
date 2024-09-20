@@ -51,6 +51,7 @@ if page == "Leads":
 
   # Dividindo a tela em duas colunas
   col1, col2 = st.columns(2)
+
   with col1:
     st.write("Número de leads por dia")
 
@@ -65,7 +66,8 @@ if page == "Leads":
     )
     # Display the graph
     st.plotly_chart(graph_dia_do_mes)
-
+  
+  with col2:
     # Create bar graph for leads by day of the month
     graph_por_loja = px.bar(
         groupby_leads_por_unidade,
@@ -75,7 +77,9 @@ if page == "Leads":
         labels={'ID do lead': 'Número de Leads', 'Unidade': 'Unidade'},
     )
 
-  with col2:
+  col3, col4 = st.columns(2)
+
+  with col3:
     # Display the graph
     st.plotly_chart(graph_por_loja)
 
@@ -88,6 +92,7 @@ if page == "Leads":
         labels={'ID do lead': 'Número de Leads', 'Fonte': 'Fonte'},
     )
 
+  with col3:
     # Display the graph
     st.plotly_chart(graph_por_fonte)
 
