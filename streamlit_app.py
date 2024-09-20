@@ -96,16 +96,19 @@ if page == "Leads":
       labels={'ID do lead': 'Número de Leads', 'Status': 'Status'},
   )
 
-  # Create a heatmap for leads by day of the month and unit
-  heatmap = px.imshow(
-    groupby_leads_por_unidade_dia_pivot,
-    labels={'color': 'Número de Leads'},
-    x=groupby_leads_por_unidade_dia_pivot.columns,
-    y=groupby_leads_por_unidade_dia_pivot.index,
-    title='Leads por Unidade e Dia do Mês',
-    aspect='auto',
-    color_continuous_scale='Viridis'  # Escolha uma escala de cor que preferir
+  # Reset index for better plotly interaction
+  df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia do mês', value_name='Número de Leads')
+
+  # Create a line chart with multiple lines (one for each unit)
+  graph_evolucao_leads = px.line(
+      df_pivot_melted,
+      x='Dia do mês',
+      y='Número de Leads',
+      color='Unidade',  # Different line for each unit
+      title='Evolução dos Leads por Unidade e Dia do Mês',
+      labels={'Número de Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
+      markers=True  # Adiciona marcadores nos pontos da linha
   )
 
-  # Display the heatmap
-  st.plotly_chart(heatmap)
+  # Display the graph
+  st.plotly_chart(graph_evolucao_leads)
