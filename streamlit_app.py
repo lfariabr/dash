@@ -29,7 +29,7 @@ if page == "Leads":
   df_leads['apenas_o_dia'] = df_leads['Dia da entrada'].dt.day
 
   # Deixando apenas Pró-Corpo
-  lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA']
+  lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
 
   # Removendo as lojas
   df_leads = df_leads[~df_leads['Unidade'].isin(lista_lojas_excluir)]
