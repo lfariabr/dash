@@ -56,7 +56,7 @@ if page == "Leads":
             markers=True
         )
         st.plotly_chart(graph_dia_do_mes)
-  
+
     with col2:
         graph_por_loja = px.bar(
             groupby_leads_por_unidade,
