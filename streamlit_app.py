@@ -122,8 +122,8 @@ if page == "Leads":
 
     # Mostrar a tabela pivotada
     st.write("Leads por Unidade por Dia")
-    st.write(groupby_leads_por_unidade_dia_pivot_tabela)
+    st.dataframe(groupby_leads_por_unidade_dia_pivot_tabela)
 
     # Mostrar a tabela pivotada
     st.write("Leads por Fontes Marketing")
-    st.write(df_leads_concatenado)
+    st.dataframe(df_leads_concatenado)
