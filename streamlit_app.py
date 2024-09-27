@@ -24,7 +24,7 @@ if page == "Leads":
     df_leads['Dia do mês'] = df_leads['Dia da entrada'].dt.day_name()
 
     # Extrair o dia do mês de 'Dia da entrada'
-    df_leads['apenas_o_dia'] = df_leads['Dia da entrada'].dt.day
+    df_leads['Dia'] = df_leads['Dia da entrada'].dt.day
 
     # Deixando apenas Pró-Corpo
     lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
@@ -33,15 +33,15 @@ if page == "Leads":
     df_leads = df_leads[~df_leads['Unidade'].isin(lista_lojas_excluir)]
 
     # Gráficos
-    groupby_leads_dia_do_mes = df_leads.groupby('apenas_o_dia').agg({'ID do lead': 'nunique'}).reset_index()
+    groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'ID do lead': 'nunique'}).reset_index()
     groupby_leads_por_unidade = df_leads.groupby('Unidade').agg({'ID do lead': 'nunique'}).reset_index()
     groupby_leads_por_fonte = df_leads.groupby('Fonte').agg({'ID do lead': 'nunique'}).reset_index()
     groupby_leads_por_status = df_leads.groupby('Status').agg({'ID do lead': 'nunique'}).reset_index()
 
     # Tabela
-    groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'apenas_o_dia']).agg({'ID do lead': 'nunique'}).reset_index()
-    groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='apenas_o_dia', values='ID do lead')
-    groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia.pivot(index='apenas_o_dia', columns='Unidade', values='ID do lead')
+    groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'Dia']).agg({'ID do lead': 'nunique'}).reset_index()
+    groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='Dia', values='ID do lead')
+    groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia.pivot(index='Dia', columns='Unidade', values='ID do lead')
     groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia_pivot_tabela.fillna(0)
 
     # Tabelas finais
@@ -68,10 +68,10 @@ if page == "Leads":
         st.write("Número de leads por dia")
         graph_dia_do_mes = px.line(
             groupby_leads_dia_do_mes,
-            x='apenas_o_dia',
+            x='Dia',
             y='ID do lead',
             title='Número de Leads por Dia do Mês',
-            labels={'ID do lead': 'Número de Leads', 'apenas_o_dia': 'Dia do mês'},
+            labels={'ID do lead': 'Número de Leads', 'Dia': 'Dia do mês'},
             markers=True
         )
         st.plotly_chart(graph_dia_do_mes)
