@@ -18,7 +18,7 @@ test_page2 = st.Page(
 pg = st.navigation(
     {
         "Teste": [test_page,test_page2],
-        "Teste2": [test_page2],
+        # "Teste2": [test_page2],
     }
 )
 
