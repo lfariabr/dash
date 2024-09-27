@@ -41,6 +41,7 @@ if page == "Leads":
     # Tabela
     groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'apenas_o_dia']).agg({'ID do lead': 'nunique'}).reset_index()
     groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='apenas_o_dia', values='ID do lead')
+    groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia.pivot(index='apenas_o_dia', columns='Unidade', values='ID do lead')
 
     # Dividindo a tela em duas colunas
     col1, col2 = st.columns(2)
@@ -106,4 +107,4 @@ if page == "Leads":
 
     # Mostrar a tabela pivotada
     st.write("Tabela Pivot")
-    st.write(groupby_leads_por_unidade_dia_pivot)
+    st.write(groupby_leads_por_unidade_dia_pivot_tabela)
