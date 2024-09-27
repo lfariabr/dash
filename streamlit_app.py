@@ -14,7 +14,7 @@ page = st.sidebar.selectbox("Choose a page", ["Leads"]) # Novo
 
 if page == "Leads":
 
-    st.title("Leads!")
+    st.title("Pag 10 - Leads")
 
     leads = 'leads.xlsx'
     df_leads = pd.read_excel(leads)
