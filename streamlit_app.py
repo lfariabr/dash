@@ -19,8 +19,8 @@ if page == "Leads":
   def load_main_dataframe(worksheet):
 
     conn = st.connection("gsheets", type=GSheetsConnection)
-    df_leads = conn.read(worksheet=worksheet,dtype={"Ad ID": str})
-
+    df_leads = conn.read(worksheet=worksheet) # dtype={"Ad ID": str}
+ 
     return df_leads
 
   st.title("Pag 10 - Leads")
