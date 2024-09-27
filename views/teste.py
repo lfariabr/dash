@@ -9,10 +9,6 @@ import streamlit as st
 import plotly.express as px
 from streamlit_gsheets import GSheetsConnection
 
-st.sidebar.title("Navigation") # Novo
-page = st.sidebar.selectbox("Choose a page", ["Leads"]) # Novo
-
-
 # if page == "Leads":
 
 @st.cache_data

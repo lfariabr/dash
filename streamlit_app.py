@@ -17,7 +17,7 @@ leads = st.Page(
 # --- NAVIGATION SETUP [WITH SECTIONS]---
 pg = st.navigation(
     {
-        "Teste": [leads],
+        "Leads": [leads],
         # "Teste2": [test_page2],
     }
 )
