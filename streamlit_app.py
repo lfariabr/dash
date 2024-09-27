@@ -2,22 +2,22 @@
 import streamlit as st
 
 # --- PAGE SETUP ---
-test_page = st.Page(
-    "views/teste.py",
-    title="teste",
+leads = st.Page(
+    "views/leads.py",
+    title="Leads",
     icon=":material/overview:",
 )
 
-test_page2 = st.Page(
-    "views/teste2.py",
-    title="teste",
-    icon=":material/overview:",
-)
+# test_page2 = st.Page(
+#     "views/teste2.py",
+#     title="teste",
+#     icon=":material/overview:",
+# )
 
 # --- NAVIGATION SETUP [WITH SECTIONS]---
 pg = st.navigation(
     {
-        "Teste": [test_page,test_page2],
+        "Teste": [leads],
         # "Teste2": [test_page2],
     }
 )
