@@ -43,6 +43,21 @@ if page == "Leads":
     groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='apenas_o_dia', values='ID do lead')
     groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia.pivot(index='apenas_o_dia', columns='Unidade', values='ID do lead')
 
+    # Tabelas finais
+    fontes_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
+    fontes_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica']
+
+    df_leads_pagas = df_leads.loc[df_leads['Fonte'].isin(fontes_pagas)]
+    df_leads_org = df_leads.loc[df_leads['Fonte'].isin(fontes_org)]
+
+    groupby_leads_pagos_por_unidade_dia = df_leads_pagas.groupby(['Unidade', 'Fonte']).agg({'ID do lead': 'nunique'}).reset_index()
+    groupby_leads_pagos_por_unidade_dia_pivot_tabela = groupby_leads_pagos_por_unidade_dia.pivot(index='Fonte', columns='Unidade', values='ID do lead')
+
+    groupby_leads_orgs_por_unidade_dia = df_leads_org.groupby(['Unidade', 'Fonte']).agg({'ID do lead': 'nunique'}).reset_index()
+    groupby_leads_orgs_por_unidade_dia_pivot_tabela = groupby_leads_orgs_por_unidade_dia.pivot(index='Fonte', columns='Unidade', values='ID do lead')
+
+    df_leads_concatenado = pd.concat([groupby_leads_pagos_por_unidade_dia_pivot_tabela, groupby_leads_orgs_por_unidade_dia_pivot_tabela], axis=0)
+
     # Dividindo a tela em duas colunas
     col1, col2 = st.columns(2)
 
@@ -106,5 +121,9 @@ if page == "Leads":
     st.plotly_chart(graph_evolucao_leads)
 
     # Mostrar a tabela pivotada
-    st.write("Tabela Pivot")
+    st.write("Leads por Unidade por Dia")
     st.write(groupby_leads_por_unidade_dia_pivot_tabela)
+
+    # Mostrar a tabela pivotada
+    st.write("Leads por Fontes Marketing")
+    st.write(df_leads_concatenado)
