@@ -42,6 +42,7 @@ if page == "Leads":
     groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'apenas_o_dia']).agg({'ID do lead': 'nunique'}).reset_index()
     groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='apenas_o_dia', values='ID do lead')
     groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia.pivot(index='apenas_o_dia', columns='Unidade', values='ID do lead')
+    groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia_pivot_tabela.fillna(0)
 
     # Tabelas finais
     fontes_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
@@ -57,6 +58,8 @@ if page == "Leads":
     groupby_leads_orgs_por_unidade_dia_pivot_tabela = groupby_leads_orgs_por_unidade_dia.pivot(index='Fonte', columns='Unidade', values='ID do lead')
 
     df_leads_concatenado = pd.concat([groupby_leads_pagos_por_unidade_dia_pivot_tabela, groupby_leads_orgs_por_unidade_dia_pivot_tabela], axis=0)
+    df_leads_concatenado = df_leads_concatenado.fillna(0)
+
 
     # Dividindo a tela em duas colunas
     col1, col2 = st.columns(2)
