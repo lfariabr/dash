@@ -90,3 +90,48 @@ with col2:
         labels={'ID do lead': 'Número de Leads', 'Unidade': 'Unidade'},
     )
     st.plotly_chart(graph_por_loja)
+
+    # Dividindo em duas colunas para os gráficos de pizza
+col3, col4 = st.columns(2)
+
+with col3:
+    graph_por_fonte = px.pie(
+        groupby_leads_por_fonte,
+        names='Fonte',
+        values='ID do lead',
+        title='Leads por Fonte',
+        labels={'ID do lead': 'Número de Leads', 'Fonte': 'Fonte'},
+    )
+    st.plotly_chart(graph_por_fonte)
+
+with col4:
+    graph_por_status = px.pie(
+        groupby_leads_por_status,
+        names='Status',
+        values='ID do lead',
+        title='Leads por Status',
+        labels={'ID do lead': 'Número de Leads', 'Status': 'Status'},
+    )
+    st.plotly_chart(graph_por_status)
+
+# Criar um gráfico de linhas com múltiplas linhas (uma para cada unidade)
+df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia do mês', value_name='Número de Leads')
+
+graph_evolucao_leads = px.line(
+    df_pivot_melted,
+    x='Dia do mês',
+    y='Número de Leads',
+    color='Unidade',  # Diferenciar as linhas por unidade
+    title='Evolução dos Leads por Unidade e Dia do Mês',
+    labels={'Número de Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
+    markers=True
+)
+st.plotly_chart(graph_evolucao_leads)
+
+# Mostrar a tabela pivotada
+st.write("Leads por Unidade por Dia")
+st.dataframe(groupby_leads_por_unidade_dia_pivot_tabela)
+
+# Mostrar a tabela pivotada
+st.write("Leads por Fontes Marketing")
+st.dataframe(df_leads_concatenado)
