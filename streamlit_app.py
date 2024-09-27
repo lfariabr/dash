@@ -91,7 +91,7 @@ if page == "Leads":
         st.plotly_chart(graph_por_status)
 
     # Criar um gráfico de linhas com múltiplas linhas (uma para cada unidade)
-    df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia do mês', value_name='Número de Leads')
+    df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['apenas_o_dia'], var_name='Dia do mês', value_name='Número de Leads')
 
     graph_evolucao_leads = px.line(
         df_pivot_melted,
