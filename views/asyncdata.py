@@ -68,60 +68,79 @@ if submitted:
             await asyncio.sleep(wait_time)
 
     async def fetch_all_leads(session, start_date, end_date, token):
-        current_page = 1
-        all_leads = []
+      current_page = 1
+      all_leads = []
 
-        while True:
-            query = '''query ($filters: LeadFiltersInput, $pagination: PaginationInput) {
-                        fetchLeads(filters: $filters, pagination: $pagination) {
-                            data {
-                                createdAt
-                                id
-                                name
-                                telephone
-                                email
-                            }
-                            meta {
-                                currentPage
-                                lastPage
-                            }
-                        }
-                    }'''
+      while True:
+          query = '''query ($filters: LeadFiltersInput, $pagination: PaginationInput) {
+                      fetchLeads(filters: $filters, pagination: $pagination) {
+                          data {
+                              createdAt
+                              id
+                              source {
+                                  title
+                              }
+                              store {
+                                  name
+                              }
+                              status {
+                                  label
+                              }
+                              customer {
+                                  id
+                                  name
+                              }
+                              name
+                              telephone
+                              email
+                              message
+                              utmMedium
+                              utmContent
+                              utmCampaign
+                              utmSearch
+                              utmTerm
+                          }
+                          meta {
+                              currentPage
+                              lastPage
+                          }
+                      }
+                  }'''
 
-            variables = {
-                'filters': {
-                    'createdAtRange': {
-                        'start': start_date,
-                        'end': end_date,
-                    },
-                },
-                'pagination': {
-                    'currentPage': current_page,
-                    'perPage': 200,
-                },
-            }
+          variables = {
+              'filters': {
+                  'createdAtRange': {
+                      'start': start_date,
+                      'end': end_date,
+                  },
+              },
+              'pagination': {
+                  'currentPage': current_page,
+                  'perPage': 200,
+              },
+          }
 
-            data = await fetch_graphql(session, 'https://open-api.eprocorpo.com.br/graphql', query, variables, token)
+          data = await fetch_graphql(session, 'https://open-api.eprocorpo.com.br/graphql', query, variables, token)
 
-            if data is None:
-                log_area.text(f"Failed to fetch leads on page {current_page}. Retrying...")
-                continue
+          if data is None:
+              print(f"Failed to fetch leads on page {current_page}. Retrying...")
+              continue
 
-            leads_data = data['data']['fetchLeads']['data']
-            all_leads.extend(leads_data)
+          leads_data = data['data']['fetchLeads']['data']
+          all_leads.extend(leads_data)
 
-            meta = data['data']['fetchLeads']['meta']
-            last_page = meta['lastPage']
+          meta = data['data']['fetchLeads']['meta']
+          last_page = meta['lastPage']
 
-            log_area.text(f"Querying Leads - Page: {current_page}/{last_page} - startDate: {start_date} - endDate: {end_date}")
+          print(f"Querying Leads - Page: {current_page}/{last_page} - startDate: {start_date} - endDate: {end_date}")
 
-            if current_page >= last_page:
-                break
+          if current_page >= last_page:
+              break
 
-            current_page += 1
-            await asyncio.sleep(5)  # Small delay to avoid hitting API complaints
+          current_page += 1
+          await asyncio.sleep(5)  # Small delay to avoid hitting API complaints
 
-        return all_leads
+      return all_leads
 
     async def fetch_all_data(start_date, end_date, extended_end_date, token):
         async with aiohttp.ClientSession() as session:
