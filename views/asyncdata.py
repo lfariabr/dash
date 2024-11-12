@@ -73,14 +73,14 @@ if submitted:
                             return None
                         return data
                     else:
-                        update_log(f"Request failed with status {response.status}")
+                        update_log(f"O download falhou devido: {response.status}")
             except aiohttp.ClientError as e:
                 update_log(f"Request exception: {e}")
 
             # Exponential backoff and retry
             attempt += 1
             wait_time = min(5 * 2 ** attempt, 30)
-            update_log(f"Retrying in {wait_time} seconds (attempt {attempt})...")
+            update_log(f"Tentando novamente em {wait_time} segundos... (Tentativa {attempt})")
             await asyncio.sleep(wait_time)
 
     async def fetch_all_leads(session, start_date, end_date, token):
@@ -225,7 +225,10 @@ if submitted:
                     "store_name": row.get('store', {}).get('name', 'N/A'),
                     "customer_id": row.get('customer', {}).get('id', 'N/A'),
                     "customer_name": row.get('customer', {}).get('name', 'N/A'),
-                    "customer_telephone": row.get('customer', {}).get('telephones', [{}])[0].get('number', 'N/A'),
+                    "customer_telephone": (
+                        row.get('customer', {}).get('telephones', [{}])[0].get('number', 'N/A')
+                        if row.get('customer', {}).get('telephones') else 'N/A'
+                    ),
                     "procedure_name": row.get('procedure', {}).get('name', 'N/A'),
                     "procedure_group": row.get('procedure', {}).get('groupLabel', 'N/A'),
                     "employee_name": row.get('employee', {}).get('name', 'N/A'),
