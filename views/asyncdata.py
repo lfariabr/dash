@@ -19,7 +19,7 @@ with st.form("input_form"):
     with col1:
         start_date = st.date_input("Data inicial", value=datetime.today().replace(day=2))
         end_date = st.date_input("Data final", value=datetime.today() - timedelta(days=1))
-    
+
     with col2:
         extended_end_date = st.date_input("Data agendamentos", value=datetime.today() + timedelta(days=15))
         token = st.text_input("Senha", type="password")
@@ -34,7 +34,7 @@ log_messages = []
 def update_log(message):
   log_messages.append(message)
   log_area.text("\n".join(log_messages))
-  
+
 # If the form is submitted, run the fetching logic
 if submitted:
     # Format dates to match the required format
@@ -44,7 +44,7 @@ if submitted:
 
     # Update the log area with initial message
     update_log("Pedido recebido!")
-    time.sleep(2) 
+    time.sleep(2)
     update_log("Processando os dados...")
     update_log(" ")
     time.sleep(2)
@@ -491,8 +491,8 @@ if submitted:
 
             # Append the row to the results list
             results_row = [
-                quote_id, customer_id, customer_name, customer_taxvat, customer_email, 
-                store_name, total_amount, installments, paid_at, due_at, is_paid, 
+                quote_id, customer_id, customer_name, customer_taxvat, customer_email,
+                store_name, total_amount, installments, paid_at, due_at, is_paid,
                 payment_method, status, quote_items
             ]
             sales_results_list.append(results_row)
@@ -512,7 +512,7 @@ if submitted:
         df_leads_appointments_bill_charges = pd.merge(df_leads_apnt_all, df_bill_charges_reduced, on='customer_id', how='left')
         df_leads_appointments_bill_charges.loc[df_leads_appointments_bill_charges['total_amount'] > 0, "is_purchase"] = True
         df_leads_appointments_bill_charges['startDate_apnt'] = df_leads_appointments_bill_charges.get('startDate_apnt', pd.NaT)
-        
+
         columns_to_keep = ['createdAt', 'id', 'source', 'store', 'message', 'utmMedium', 'utmCampaign', 'utmContent', 'utmSearch', 'utmTerm',
                           'customer_id', 'is_customer', 'is_appointment', 'is_served', 'is_purchase',
                           'startDate_apnt', 'status_apnt', 'store_apnt', 'total_amount', 'paid_at', 'quote_items', 'installments']
@@ -520,7 +520,7 @@ if submitted:
         df_mkt = df_leads_appointments_bill_charges[columns_to_keep]
         df_mkt.loc[df_mkt['store_apnt'].notnull(), 'is_appointment'] = True
         df_mkt.loc[df_mkt['status_apnt'] == "Atendido", 'is_served'] = True
-        
+
 
         # Tratamentos finais
         df_mkt['createdAt'] = pd.to_datetime(df_mkt['createdAt']).dt.date
@@ -586,27 +586,32 @@ if submitted:
     update_log("Salvando dados no Google Sheets...")
     # Google Sheets and Colab setup
     import gspread
-    from google.colab import drive, auth
-    from google.auth import default
+    from google.oauth2.service_account import Credentials
     from gspread_dataframe import set_with_dataframe
+    import json
 
-    # Authenticate and set up Google Sheets access
-    auth.authenticate_user()
-    creds, _ = default()
+    # Assemble credentials from Streamlit secrets
+    creds_dict = {
+        "type": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["type"],
+        "project_id": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["project_id"],
+        "private_key_id": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["private_key_id"],
+        "private_key": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["private_key"],
+        "client_email": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_email"],
+        "client_id": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_id"],
+        "auth_uri": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["auth_uri"],
+        "token_uri": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_x509_cert_url"]
+    }
+
+    creds = Credentials.from_service_account_info(creds_dict)
     gc = gspread.authorize(creds)
 
-    # Mount Google Drive (optional if you need access to Google Drive files)
-    drive.mount('/content/drive')
-
-    # Define the Google Sheets URL and open it
+    # Interact with Google Sheets
     url_to_paste = 'https://docs.google.com/spreadsheets/d/1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc/'
     spreadsheet = gc.open_by_url(url_to_paste)
-
-    # Select the worksheet named 'data'
     sheet_data = spreadsheet.worksheet('data')
 
-    # Clear existing data in the worksheet
+    # Clear the sheet and write the DataFrame
     sheet_data.clear()
-
-    # Write your DataFrame to Google Sheets
     set_with_dataframe(sheet_data, df_mkt_result)
