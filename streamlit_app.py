@@ -17,6 +17,7 @@ asyncdata = st.Page(
 pg = st.navigation(
     {
         "Leads": [leads],
+        "Async": [asyncdata]
         # "Teste2": [test_page2],
     }
 )
