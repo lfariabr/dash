@@ -557,6 +557,6 @@ if submitted:
         update_log("Processamento concluído com sucesso.")
         return df_mkt
 
-# Exemplo de chamada da função de processamento, com logs sendo exibidos em tempo real
-df_mkt_result = process_data(df_leads, df_appointments, df_bill_charges)
-st.write(df_mkt_result)
+    # Exemplo de chamada da função de processamento, com logs sendo exibidos em tempo real
+    df_mkt_result = process_data(df_leads, df_appointments, df_bill_charges)
+    st.write(df_mkt_result)
