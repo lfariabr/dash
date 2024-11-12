@@ -8,12 +8,11 @@ leads = st.Page(
     icon=":material/overview:",
 )
 
-# test_page2 = st.Page(
-#     "views/teste2.py",
-#     title="teste",
-#     icon=":material/overview:",
-# )
-
+asyncdata = st.Page(
+    "views/asyncdata.py",
+    title="Data Async",
+    icon=":material/overview:",
+)
 # --- NAVIGATION SETUP [WITH SECTIONS]---
 pg = st.navigation(
     {
