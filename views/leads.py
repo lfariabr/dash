@@ -11,7 +11,7 @@ from streamlit_gsheets import GSheetsConnection
 
 # if page == "Leads":
 @st.cache_data()
-def load_dataframe(worksheet):
+def load_main_dataframe(worksheet):
     conn = st.connection("gsheets", type=GSheetsConnection)
     df = conn.read(worksheet=worksheet)
     return df_leads
