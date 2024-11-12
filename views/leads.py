@@ -20,7 +20,7 @@ def load_main_dataframe(data):
 st.title("Leads Carregados")
 
 # leads = 'leads.xlsx'
-df_leads = load_main_dataframe()
+df_leads = load_main_dataframe('data')
 
 # Extrair o Dia de 'Dia da entrada'
 df_leads['Dia'] = df_leads['createdAt'].dt.day
