@@ -13,8 +13,8 @@ from streamlit_gsheets import GSheetsConnection
 
 @st.cache_data
 def load_main_dataframe(worksheet_name):
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    conn.connect(spreadsheet="1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc")
+    # Estabelece conexão e lê os dados
+    conn = st.connection("gsheets", type=GSheetsConnection, spreadsheet="1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc")
     df_leads = conn.read(worksheet=worksheet_name)
     return df_leads
 
