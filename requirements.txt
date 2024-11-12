@@ -7,4 +7,3 @@ st-gsheets-connection
 aiohttp
 asyncio
 nest_asyncio
-time
