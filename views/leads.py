@@ -57,34 +57,34 @@ df_leads['Dia'] = df_leads['createdAt'].dt.day
 lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
 
 # Remover as lojas
-df_leads = df_leads[~df_leads['Unidade'].isin(lista_lojas_excluir)]
+df_leads = df_leads[~df_leads['store'].isin(lista_lojas_excluir)]
 
 # Gráficos
 groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_unidade = df_leads.groupby('Unidade').agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_fonte = df_leads.groupby('Fonte').agg({'ID do lead': 'nunique'}).reset_index()
+groupby_leads_por_store = df_leads.groupby('store').agg({'ID do lead': 'nunique'}).reset_index()
+groupby_leads_por_source = df_leads.groupby('source').agg({'ID do lead': 'nunique'}).reset_index()
 groupby_leads_por_status = df_leads.groupby('Status').agg({'ID do lead': 'nunique'}).reset_index()
 
 # Tabela
-groupby_leads_por_unidade_dia = df_leads.groupby(['Unidade', 'Dia']).agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_unidade_dia_pivot = groupby_leads_por_unidade_dia.pivot(index='Unidade', columns='Dia', values='ID do lead')
-groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia.pivot(index='Dia', columns='Unidade', values='ID do lead')
-groupby_leads_por_unidade_dia_pivot_tabela = groupby_leads_por_unidade_dia_pivot_tabela.fillna(0)
+groupby_leads_por_store_dia = df_leads.groupby(['store', 'Dia']).agg({'ID do lead': 'nunique'}).reset_index()
+groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='ID do lead')
+groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia.pivot(index='Dia', columns='store', values='ID do lead')
+groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia_pivot_tabela.fillna(0)
 
 # Tabelas finais
-fontes_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
-fontes_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica']
+sources_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
+sources_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica']
 
-df_leads_pagas = df_leads.loc[df_leads['Fonte'].isin(fontes_pagas)]
-df_leads_org = df_leads.loc[df_leads['Fonte'].isin(fontes_org)]
+df_leads_pagas = df_leads.loc[df_leads['source'].isin(sources_pagas)]
+df_leads_org = df_leads.loc[df_leads['source'].isin(sources_org)]
 
-groupby_leads_pagos_por_unidade_dia = df_leads_pagas.groupby(['Unidade', 'Fonte']).agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_pagos_por_unidade_dia_pivot_tabela = groupby_leads_pagos_por_unidade_dia.pivot(index='Fonte', columns='Unidade', values='ID do lead')
+groupby_leads_pagos_por_store_dia = df_leads_pagas.groupby(['store', 'source']).agg({'ID do lead': 'nunique'}).reset_index()
+groupby_leads_pagos_por_store_dia_pivot_tabela = groupby_leads_pagos_por_store_dia.pivot(index='source', columns='store', values='ID do lead')
 
-groupby_leads_orgs_por_unidade_dia = df_leads_org.groupby(['Unidade', 'Fonte']).agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_orgs_por_unidade_dia_pivot_tabela = groupby_leads_orgs_por_unidade_dia.pivot(index='Fonte', columns='Unidade', values='ID do lead')
+groupby_leads_orgs_por_store_dia = df_leads_org.groupby(['store', 'source']).agg({'ID do lead': 'nunique'}).reset_index()
+groupby_leads_orgs_por_store_dia_pivot_tabela = groupby_leads_orgs_por_store_dia.pivot(index='source', columns='store', values='ID do lead')
 
-df_leads_concatenado = pd.concat([groupby_leads_pagos_por_unidade_dia_pivot_tabela, groupby_leads_orgs_por_unidade_dia_pivot_tabela], axis=0)
+df_leads_concatenado = pd.concat([groupby_leads_pagos_por_store_dia_pivot_tabela, groupby_leads_orgs_por_store_dia_pivot_tabela], axis=0)
 df_leads_concatenado = df_leads_concatenado.fillna(0)
 
 
@@ -105,11 +105,11 @@ with col1:
 
 with col2:
     graph_por_loja = px.bar(
-        groupby_leads_por_unidade,
-        x='Unidade',
+        groupby_leads_por_store,
+        x='store',
         y='ID do lead',
         title='Número de Leads por Loja',
-        labels={'ID do lead': 'Número de Leads', 'Unidade': 'Unidade'},
+        labels={'ID do lead': 'Número de Leads', 'store': 'store'},
     )
     st.plotly_chart(graph_por_loja)
 
@@ -117,14 +117,14 @@ with col2:
 col3, col4 = st.columns(2)
 
 with col3:
-    graph_por_fonte = px.pie(
-        groupby_leads_por_fonte,
-        names='Fonte',
+    graph_por_source = px.pie(
+        groupby_leads_por_source,
+        names='source',
         values='ID do lead',
-        title='Leads por Fonte',
-        labels={'ID do lead': 'Número de Leads', 'Fonte': 'Fonte'},
+        title='Leads por source',
+        labels={'ID do lead': 'Número de Leads', 'source': 'source'},
     )
-    st.plotly_chart(graph_por_fonte)
+    st.plotly_chart(graph_por_source)
 
 with col4:
     graph_por_status = px.pie(
@@ -136,24 +136,24 @@ with col4:
     )
     st.plotly_chart(graph_por_status)
 
-# Criar um gráfico de linhas com múltiplas linhas (uma para cada unidade)
-df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia do mês', value_name='Número de Leads')
+# Criar um gráfico de linhas com múltiplas linhas (uma para cada store)
+df_pivot_melted = groupby_leads_por_store_dia_pivot.reset_index().melt(id_vars=['store'], var_name='Dia do mês', value_name='Número de Leads')
 
 graph_evolucao_leads = px.line(
     df_pivot_melted,
     x='Dia do mês',
     y='Número de Leads',
-    color='Unidade',  # Diferenciar as linhas por unidade
-    title='Evolução dos Leads por Unidade e Dia do Mês',
+    color='store',  # Diferenciar as linhas por store
+    title='Evolução dos Leads por store e Dia do Mês',
     labels={'Número de Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
     markers=True
 )
 st.plotly_chart(graph_evolucao_leads)
 
 # Mostrar a tabela pivotada
-st.write("Leads por Unidade por Dia")
-st.dataframe(groupby_leads_por_unidade_dia_pivot_tabela)
+st.write("Leads por store por Dia")
+st.dataframe(groupby_leads_por_store_dia_pivot_tabela)
 
 # Mostrar a tabela pivotada
-st.write("Leads por Fontes Marketing")
+st.write("Leads por sources Marketing")
 st.dataframe(df_leads_concatenado)
