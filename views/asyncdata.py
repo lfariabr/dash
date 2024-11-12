@@ -148,7 +148,7 @@ if submitted:
             meta = data['data']['fetchLeads']['meta']
             last_page = meta['lastPage']
 
-            update_log(f"Extraindo Leads. Pág: {current_page}/{last_page}. De: {start_date} - Até: {end_date}")
+            update_log(f"Baixando Leads. Pág: {current_page}/{last_page}. De: {start_date} - Até: {end_date}")
 
             if current_page >= last_page:
                 break
@@ -240,7 +240,7 @@ if submitted:
             meta = data['data']['fetchAppointments']['meta']
             last_page = meta['lastPage']
 
-            update_log(f"Extraindo Agendamentos. Pág. {current_page}/{last_page}. De: {start_date} - Até: {extended_end_date}")
+            update_log(f"Baixando Agendamentos. Pág. {current_page}/{last_page}. De: {start_date} - Até: {extended_end_date}")
 
             if current_page >= last_page:
                 break
@@ -317,7 +317,7 @@ if submitted:
             all_bill_charges.extend(bill_charges_data)
 
             meta = data['data']['fetchBillCharges']['meta']
-            update_log(f"Extraindo Vendas. Pág. {current_page}/{meta['lastPage']}. De: {start_date} - Até: {end_date}")
+            update_log(f"Baixando Vendas. Pág. {current_page}/{meta['lastPage']}. De: {start_date} - Até: {end_date}")
             last_page = meta['lastPage']
 
             if current_page >= last_page:
@@ -505,7 +505,8 @@ if submitted:
 
         df_leads_appointments_bill_charges = pd.merge(df_leads_apnt_all, df_bill_charges_reduced, on='customer_id', how='left')
         df_leads_appointments_bill_charges.loc[df_leads_appointments_bill_charges['total_amount'] > 0, "is_purchase"] = True
-
+        df_leads_appointments_bill_charges['startDate_apnt'] = df_leads_appointments_bill_charges.get('startDate_apnt', pd.NaT)
+        
         columns_to_keep = ['createdAt', 'id', 'source', 'store', 'message', 'utmMedium', 'utmCampaign', 'utmContent', 'utmSearch', 'utmTerm',
                           'customer_id', 'is_customer', 'is_appointment', 'is_served', 'is_purchase',
                           'startDate_apnt', 'status_apnt', 'store_apnt', 'total_amount', 'paid_at', 'quote_items', 'installments']
@@ -513,6 +514,7 @@ if submitted:
         df_mkt = df_leads_appointments_bill_charges[columns_to_keep]
         df_mkt.loc[df_mkt['store_apnt'].notnull(), 'is_appointment'] = True
         df_mkt.loc[df_mkt['status_apnt'] == "Atendido", 'is_served'] = True
+        
 
         # Tratamentos finais
         df_mkt['createdAt'] = pd.to_datetime(df_mkt['createdAt']).dt.date
