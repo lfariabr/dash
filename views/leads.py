@@ -13,13 +13,16 @@ from streamlit_gsheets import GSheetsConnection
 
 @st.cache_data
 def load_main_dataframe(worksheet_name):
-    # Conectando ao Google Sheets usando o ID específico da sua planilha
     conn = st.connection("gsheets", type=GSheetsConnection)
-    df_leads = conn.read(spreadsheet="1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc", worksheet=worksheet_name)  # ID da planilha e aba
+    conn.connect(spreadsheet="1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc")
+    df_leads = conn.read(worksheet=worksheet_name)
     return df_leads
 
-# Carrega os dados da aba "data"
-df_leads = load_main_dataframe('data')
+st.title("Pag 10 - Leads")
+
+# Carregar dados da aba 'data'
+df_leads = load_main_dataframe("data")
+st.write(df_leads)
 
 # Trabalhando com datas
 df_leads['Dia da entrada'] = pd.to_datetime(df_leads['Dia da entrada']) # trata estes dados como texto
