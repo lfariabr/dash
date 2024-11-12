@@ -48,11 +48,34 @@ filtered_data = df_leads[
     (df_leads['category'] == category_filter)
 ]
 
-# Exibir dados filtrados
-st.write(filtered_data)
-
 # Visualização dos dados
 st.title("Visualização de Dados Filtrados")
+
+# Gráfico de linhas para leads por dia
 group_by_day = filtered_data.groupby('createdAt').size().reset_index(name='count')
-fig = px.bar(group_by_day, x='createdAt', y='count', title='Leads por Dia')
+fig = px.line(group_by_day, x='createdAt', y='count', title='Leads por Dia')
 st.plotly_chart(fig)
+
+# Gráfico de barras para leads por loja
+group_by_store = filtered_data.groupby('store').size().reset_index(name='count')
+fig_store = px.bar(group_by_store, x='store', y='count', title='Leads por Loja')
+st.plotly_chart(fig_store)
+
+# Gráfico de pizza para leads por fonte
+group_by_source = filtered_data.groupby('source').size().reset_index(name='count')
+fig_source = px.pie(group_by_source, names='source', values='count', title='Leads por Fonte')
+st.plotly_chart(fig_source)
+
+# Gráfico de pizza para leads por status
+group_by_status = filtered_data.groupby('status_apnt').size().reset_index(name='count')
+fig_status = px.pie(group_by_status, names='status_apnt', values='count', title='Leads por Status')
+st.plotly_chart(fig_status)
+
+# Tabela de leads por loja e dia
+groupby_leads_por_store_dia = filtered_data.groupby(['store', 'Dia']).size().reset_index(name='count')
+groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='count').fillna(0)
+st.write("Leads por Loja por Dia", groupby_leads_por_store_dia_pivot)
+
+# Execução do script
+if __name__ == '__main__':
+    st.write("Script executado com sucesso!")
