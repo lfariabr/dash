@@ -28,14 +28,18 @@ log_area = st.empty()  # This will be used to display real-time logs
 
 # If the form is submitted, run the fetching logic
 if submitted:
-    with st.spinner("🔄 Carregando... Por favor, aguarde enquanto os dados estão sendo buscados."):
-        # Format dates to match the required format
-        start_date_str = start_date.strftime('%Y-%m-%d')
-        end_date_str = end_date.strftime('%Y-%m-%d')
-        extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
+    # Format dates to match the required format
+    start_date_str = start_date.strftime('%Y-%m-%d')
+    end_date_str = end_date.strftime('%Y-%m-%d')
+    extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
 
-        # Print formatted dates
-        log_area.text(f"Start Date: {start_date_str}\nEnd Date: {end_date_str}\nExtended End Date: {extended_end_date_str}")
+    # Print formatted dates directly on the screen (outside log area)
+    st.write(f"### Start Date: {start_date_str}")
+    st.write(f"### End Date: {end_date_str}")
+    st.write(f"### Extended End Date: {extended_end_date_str}")
+
+    # Update the log area with any other messages if needed
+    log_area.text("Os dados foram recebidos e processados!")
 
     async def fetch_graphql(session, url, query, variables, token):
         headers = {
