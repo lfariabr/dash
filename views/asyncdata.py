@@ -10,7 +10,7 @@ import time
 nest_asyncio.apply()
 
 # Define the Streamlit page
-st.title("Leads Self Service 3.0")
+st.title("Leads Self Service v3.0")
 
 # Define layout em duas colunas
 col1, col2 = st.columns(2)
