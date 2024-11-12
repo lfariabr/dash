@@ -8,19 +8,41 @@ import json
 import streamlit as st
 import plotly.express as px
 from streamlit_gsheets import GSheetsConnection
+from gspread_dataframe import get_as_dataframe
 
-@st.cache_data()
-def load_dataframe(worksheet):
-    conn = st.connection("gsheets", type=GSheetsConnection)
-    df = conn.read(worksheet=worksheet)
-    return df
 
-st.title("Leads Carregados")
+# Função para carregar dados do Google Sheets
+@st.cache(allow_output_mutation=True)
+def load_data_from_gsheet():
+    # Autenticar com Google usando as credenciais do secrets
+    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+    creds_dict = {
+        "type": "service_account",
+        "project_id": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["project_id"],
+        "private_key_id": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["private_key_id"],
+        "private_key": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["private_key"].replace('\\n', '\n'),
+        "client_email": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_email"],
+        "client_id": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_id"],
+        "auth_uri": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["auth_uri"],
+        "token_uri": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_x509_cert_url"]
+    }
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
+    client = gspread.authorize(creds)
 
-# Carregar dados da planilha no Google Sheets
-df_leads = load_dataframe("data")  # Usando a aba "data"
-st.session_state.setdefault("df_leads", df_leads)
+    # Abrir a planilha e ler os dados
+    spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc/')
+    worksheet = spreadsheet.worksheet('data')
+    data = get_as_dataframe(worksheet, evaluate_formulas=True)
+    return data.dropna(how='all', axis=1)  # Limpa colunas totalmente vazias
 
+# Carregar dados
+df_leads = load_data_from_gsheet()
+
+# Exibir dados
+st.title("Dados Carregados do Google Sheets")
+st.write(df_leads)
 
 # Trabalhando com datas
 df_leads['Dia da entrada'] = pd.to_datetime(df_leads['Dia da entrada']) # trata estes dados como texto
