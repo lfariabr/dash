@@ -14,6 +14,7 @@ from streamlit_gsheets import GSheetsConnection
 @st.cache_data
 def load_main_dataframe(data):
     conn = st.connection("gsheets", type=GSheetsConnection)
+    conn.connect(spreadsheet_id="1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc")  # Use o ID da sua planilha
     df_leads = conn.read(worksheet=data)  # lê os dados da aba "data"
     return df_leads
 
