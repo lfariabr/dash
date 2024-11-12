@@ -60,15 +60,15 @@ lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
 df_leads = df_leads[~df_leads['store'].isin(lista_lojas_excluir)]
 
 # Gráficos
-groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_store = df_leads.groupby('store').agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_source = df_leads.groupby('source').agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_status = df_leads.groupby('Status').agg({'ID do lead': 'nunique'}).reset_index()
+groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_store = df_leads.groupby('store').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_source = df_leads.groupby('source').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_status = df_leads.groupby('Status').agg({'id': 'nunique'}).reset_index()
 
 # Tabela
-groupby_leads_por_store_dia = df_leads.groupby(['store', 'Dia']).agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='ID do lead')
-groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia.pivot(index='Dia', columns='store', values='ID do lead')
+groupby_leads_por_store_dia = df_leads.groupby(['store', 'Dia']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='id')
+groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia.pivot(index='Dia', columns='store', values='id')
 groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia_pivot_tabela.fillna(0)
 
 # Tabelas finais
@@ -78,11 +78,11 @@ sources_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica']
 df_leads_pagas = df_leads.loc[df_leads['source'].isin(sources_pagas)]
 df_leads_org = df_leads.loc[df_leads['source'].isin(sources_org)]
 
-groupby_leads_pagos_por_store_dia = df_leads_pagas.groupby(['store', 'source']).agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_pagos_por_store_dia_pivot_tabela = groupby_leads_pagos_por_store_dia.pivot(index='source', columns='store', values='ID do lead')
+groupby_leads_pagos_por_store_dia = df_leads_pagas.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_pagos_por_store_dia_pivot_tabela = groupby_leads_pagos_por_store_dia.pivot(index='source', columns='store', values='id')
 
-groupby_leads_orgs_por_store_dia = df_leads_org.groupby(['store', 'source']).agg({'ID do lead': 'nunique'}).reset_index()
-groupby_leads_orgs_por_store_dia_pivot_tabela = groupby_leads_orgs_por_store_dia.pivot(index='source', columns='store', values='ID do lead')
+groupby_leads_orgs_por_store_dia = df_leads_org.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_orgs_por_store_dia_pivot_tabela = groupby_leads_orgs_por_store_dia.pivot(index='source', columns='store', values='id')
 
 df_leads_concatenado = pd.concat([groupby_leads_pagos_por_store_dia_pivot_tabela, groupby_leads_orgs_por_store_dia_pivot_tabela], axis=0)
 df_leads_concatenado = df_leads_concatenado.fillna(0)
@@ -96,9 +96,9 @@ with col1:
     graph_dia_do_mes = px.line(
         groupby_leads_dia_do_mes,
         x='Dia',
-        y='ID do lead',
+        y='id',
         title='Número de Leads por Dia do Mês',
-        labels={'ID do lead': 'Número de Leads', 'Dia': 'Dia do mês'},
+        labels={'id': 'Número de Leads', 'Dia': 'Dia do mês'},
         markers=True
     )
     st.plotly_chart(graph_dia_do_mes)
@@ -107,9 +107,9 @@ with col2:
     graph_por_loja = px.bar(
         groupby_leads_por_store,
         x='store',
-        y='ID do lead',
+        y='id',
         title='Número de Leads por Loja',
-        labels={'ID do lead': 'Número de Leads', 'store': 'store'},
+        labels={'id': 'Número de Leads', 'store': 'store'},
     )
     st.plotly_chart(graph_por_loja)
 
@@ -120,9 +120,9 @@ with col3:
     graph_por_source = px.pie(
         groupby_leads_por_source,
         names='source',
-        values='ID do lead',
+        values='id',
         title='Leads por source',
-        labels={'ID do lead': 'Número de Leads', 'source': 'source'},
+        labels={'id': 'Número de Leads', 'source': 'source'},
     )
     st.plotly_chart(graph_por_source)
 
@@ -130,9 +130,9 @@ with col4:
     graph_por_status = px.pie(
         groupby_leads_por_status,
         names='Status',
-        values='ID do lead',
+        values='id',
         title='Leads por Status',
-        labels={'ID do lead': 'Número de Leads', 'Status': 'Status'},
+        labels={'id': 'Número de Leads', 'Status': 'Status'},
     )
     st.plotly_chart(graph_por_status)
 
