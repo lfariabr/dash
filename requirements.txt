@@ -1,9 +1,10 @@
 
 streamlit
-streamlit
 pandas
 plotly
 openpyxl
 st-gsheets-connection
 aiohttp
 asyncio
+nest_asyncio
+time
