@@ -10,13 +10,10 @@ import plotly.express as px
 from streamlit_gsheets import GSheetsConnection
 
 # if page == "Leads":
-
-@st.cache_data
-def load_main_dataframe(spreadsheet_id, worksheet_name):
-    # Conecte-se ao Google Sheets usando o ID da planilha
+@st.cache_data()
+def load_dataframe(worksheet):
     conn = st.connection("gsheets", type=GSheetsConnection)
-    conn._connect(spreadsheet_id=spreadsheet_id)  # Especifica o ID da planilha manualmente
-    df_leads = conn.read(worksheet=worksheet_name)
+    df = conn.read(worksheet=worksheet)
     return df_leads
 
 st.title("Pag 10 - Leads")
