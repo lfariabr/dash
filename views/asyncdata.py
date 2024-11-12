@@ -34,12 +34,12 @@ if submitted:
     extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
 
     # Print formatted dates directly on the screen (outside log area)
-    st.write(f"### Start Date: {start_date_str}")
-    st.write(f"### End Date: {end_date_str}")
-    st.write(f"### Extended End Date: {extended_end_date_str}")
+    st.write(f"#### Data inicial: {start_date_str}")
+    st.write(f"#### Data final: {end_date_str}")
+    st.write(f"#### Data agendamentos: {extended_end_date_str}")
 
     # Update the log area with any other messages if needed
-    log_area.text("Os dados foram recebidos e processados!")
+    log_area.text("Aguarde, os dados estão sendo processados...")
 
     async def fetch_graphql(session, url, query, variables, token):
         headers = {
