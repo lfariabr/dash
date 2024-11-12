@@ -2,7 +2,7 @@
 import streamlit as st
 
 # --- PAGE SETUP ---
-leads = st.Page(
+graphics = st.Page(
     "views/leads.py",
     title="Leads",
     icon=":material/overview:",
@@ -16,7 +16,7 @@ asyncdata = st.Page(
 # --- NAVIGATION SETUP [WITH SECTIONS]---
 pg = st.navigation(
     {
-        "Marketing": [leads, asyncdata],
+        "Marketing": [asyncdata, graphics],
         # "Async": [asyncdata]
         # "Teste2": [test_page2],
     }
