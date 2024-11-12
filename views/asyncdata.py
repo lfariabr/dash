@@ -133,7 +133,7 @@ if submitted:
           meta = data['data']['fetchLeads']['meta']
           last_page = meta['lastPage']
 
-          print(f"Querying Leads - Page: {current_page}/{last_page} - startDate: {start_date} - endDate: {end_date}")
+          log_area.text(f"Querying Leads - Page: {current_page}/{last_page} - startDate: {start_date} - endDate: {end_date}")
 
           if current_page >= last_page:
               break
