@@ -38,10 +38,10 @@ if submitted:
     end_date_str = end_date.strftime('%Y-%m-%d')
     extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
 
-    # Print formatted dates directly on the screen (outside log area)
-    st.write(f"Data inicial: {start_date_str}")
-    st.write(f"Data final: {end_date_str}")
-    st.write(f"Data agendamentos: {extended_end_date_str}")
+    # Print formatted dates directly on the screen (outside log area) with smaller font
+    st.markdown(f"<p style='font-size:10px'>Data inicial: {start_date_str}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:10px'>Data final: {end_date_str}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:10px'>Data agendamentos: {extended_end_date_str}</p>", unsafe_allow_html=True)
 
     # Update the log area with initial message
     update_log("Aguarde, os dados estão sendo processados...")
@@ -142,7 +142,7 @@ if submitted:
             meta = data['data']['fetchLeads']['meta']
             last_page = meta['lastPage']
 
-            update_log(f"Querying Leads - Page: {current_page}/{last_page} - startDate: {start_date} - endDate: {end_date}")
+            update_log(f"Extraindo Leads. Pág: {current_page}/{last_page}. De: {start_date} - Até: {end_date}")
 
             if current_page >= last_page:
                 break
@@ -234,7 +234,7 @@ if submitted:
             meta = data['data']['fetchAppointments']['meta']
             last_page = meta['lastPage']
 
-            update_log(f"Querying Appointments - Page: {current_page}/{last_page} - startDate: {start_date} - endDate: {extended_end_date}")
+            update_log(f"Extraindo Agendamentos. Pág. {current_page}/{last_page}. De: {start_date} - Até: {extended_end_date}")
 
             if current_page >= last_page:
                 break
@@ -311,7 +311,7 @@ if submitted:
             all_bill_charges.extend(bill_charges_data)
 
             meta = data['data']['fetchBillCharges']['meta']
-            update_log(f"Querying Bill Charges - Page: {current_page}/{meta['lastPage']} - startDate: {start_date} - endDate: {end_date}")
+            update_log(f"Extraindo Vendas. Pág. {current_page}/{meta['lastPage']}. De: {start_date} - Até: {end_date}")
             last_page = meta['lastPage']
 
             if current_page >= last_page:
