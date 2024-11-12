@@ -63,7 +63,7 @@ df_leads = df_leads[~df_leads['store'].isin(lista_lojas_excluir)]
 groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'id': 'nunique'}).reset_index()
 groupby_leads_por_store = df_leads.groupby('store').agg({'id': 'nunique'}).reset_index()
 groupby_leads_por_source = df_leads.groupby('source').agg({'id': 'nunique'}).reset_index()
-groupby_leads_por_status = df_leads.groupby('Status').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_status_apnt = df_leads.groupby('status_apnt').agg({'id': 'nunique'}).reset_index()
 
 # Tabela
 groupby_leads_por_store_dia = df_leads.groupby(['store', 'Dia']).agg({'id': 'nunique'}).reset_index()
@@ -127,14 +127,14 @@ with col3:
     st.plotly_chart(graph_por_source)
 
 with col4:
-    graph_por_status = px.pie(
-        groupby_leads_por_status,
-        names='Status',
+    graph_por_status_apnt = px.pie(
+        groupby_leads_por_status_apnt,
+        names='status_apnt',
         values='id',
-        title='Leads por Status',
-        labels={'id': 'Número de Leads', 'Status': 'Status'},
+        title='Leads por status_apnt',
+        labels={'id': 'Número de Leads', 'status_apnt': 'status_apnt'},
     )
-    st.plotly_chart(graph_por_status)
+    st.plotly_chart(graph_por_status_apnt)
 
 # Criar um gráfico de linhas com múltiplas linhas (uma para cada store)
 df_pivot_melted = groupby_leads_por_store_dia_pivot.reset_index().melt(id_vars=['store'], var_name='Dia do mês', value_name='Número de Leads')
