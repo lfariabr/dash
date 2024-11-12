@@ -1,15 +1,21 @@
 
-import streamlit as st
+import os
+import shutil
+import subprocess
 import pandas as pd
+import requests
+import json
+import streamlit as st
 import plotly.express as px
 import gspread
+from streamlit_gsheets import GSheetsConnection
 from google.oauth2.service_account import Credentials
 from gspread_dataframe import get_as_dataframe
-from streamlit_gsheets import GSheetsConnection
+
 
 # Função para carregar dados do Google Sheets
 @st.cache(allow_output_mutation=True)
-def load_data_from_gsheet(worksheet_name='data'):
+def load_data_from_gsheet():
     # Autenticar com Google usando as credenciais do secrets
     scopes = ["https://www.googleapis.com/auth/spreadsheets"]
     creds_dict = {
@@ -29,53 +35,124 @@ def load_data_from_gsheet(worksheet_name='data'):
 
     # Abrir a planilha e ler os dados
     spreadsheet = client.open_by_url('https://docs.google.com/spreadsheets/d/1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc/')
-    worksheet = spreadsheet.worksheet(worksheet_name)
+    worksheet = spreadsheet.worksheet('data')
     data = get_as_dataframe(worksheet, evaluate_formulas=True)
     return data.dropna(how='all', axis=1)  # Limpa colunas totalmente vazias
 
 # Carregar dados
 df_leads = load_data_from_gsheet()
 
-# Filtrar os dados
-source_filter = st.selectbox('Selecione a Fonte', df_leads['source'].unique())
-store_filter = st.selectbox('Selecione a Loja', df_leads['store'].unique())
-category_filter = st.selectbox('Selecione a Categoria', df_leads['category'].unique())
+# Exibir dados
+st.title("Dados da Planilha")
+st.write(df_leads)
 
-# Aplicar os filtros
-filtered_data = df_leads[
-    (df_leads['source'] == source_filter) &
-    (df_leads['store'] == store_filter) &
-    (df_leads['category'] == category_filter)
-]
+# Trabalhando com datas
+df_leads['createdAt'] = pd.to_datetime(df_leads['createdAt']) # trata estes dados como texto
+df_leads['Dia do mês'] = df_leads['createdAt'].dt.day_name()
 
-# Visualização dos dados
-st.title("Visualização de Dados Filtrados")
+# Extrair o dia do mês de 'createdAt'
+df_leads['Dia'] = df_leads['createdAt'].dt.day
 
-# Gráfico de linhas para leads por dia
-group_by_day = filtered_data.groupby('createdAt').size().reset_index(name='count')
-fig = px.line(group_by_day, x='createdAt', y='count', title='Leads por Dia')
-st.plotly_chart(fig)
+# Deixando apenas Pró-Corpo
+lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
 
-# Gráfico de barras para leads por loja
-group_by_store = filtered_data.groupby('store').size().reset_index(name='count')
-fig_store = px.bar(group_by_store, x='store', y='count', title='Leads por Loja')
-st.plotly_chart(fig_store)
+# Remover as lojas
+df_leads = df_leads[~df_leads['store'].isin(lista_lojas_excluir)]
 
-# Gráfico de pizza para leads por fonte
-group_by_source = filtered_data.groupby('source').size().reset_index(name='count')
-fig_source = px.pie(group_by_source, names='source', values='count', title='Leads por Fonte')
-st.plotly_chart(fig_source)
+# Gráficos
+groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_store = df_leads.groupby('store').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_source = df_leads.groupby('source').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_status_apnt = df_leads.groupby('status_apnt').agg({'id': 'nunique'}).reset_index()
 
-# Gráfico de pizza para leads por status
-group_by_status = filtered_data.groupby('status_apnt').size().reset_index(name='count')
-fig_status = px.pie(group_by_status, names='status_apnt', values='count', title='Leads por Status')
-st.plotly_chart(fig_status)
+# Tabela
+groupby_leads_por_store_dia = df_leads.groupby(['store', 'Dia']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='id')
+groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia.pivot(index='Dia', columns='store', values='id')
+groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia_pivot_tabela.fillna(0)
 
-# Tabela de leads por loja e dia
-groupby_leads_por_store_dia = filtered_data.groupby(['store', 'Dia']).size().reset_index(name='count')
-groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='count').fillna(0)
-st.write("Leads por Loja por Dia", groupby_leads_por_store_dia_pivot)
+# Tabelas finais
+sources_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
+sources_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica']
 
-# Execução do script
-if __name__ == '__main__':
-    st.write("Script executado com sucesso!")
+df_leads_pagas = df_leads.loc[df_leads['source'].isin(sources_pagas)]
+df_leads_org = df_leads.loc[df_leads['source'].isin(sources_org)]
+
+groupby_leads_pagos_por_store_dia = df_leads_pagas.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_pagos_por_store_dia_pivot_tabela = groupby_leads_pagos_por_store_dia.pivot(index='source', columns='store', values='id')
+
+groupby_leads_orgs_por_store_dia = df_leads_org.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_orgs_por_store_dia_pivot_tabela = groupby_leads_orgs_por_store_dia.pivot(index='source', columns='store', values='id')
+
+df_leads_concatenado = pd.concat([groupby_leads_pagos_por_store_dia_pivot_tabela, groupby_leads_orgs_por_store_dia_pivot_tabela], axis=0)
+df_leads_concatenado = df_leads_concatenado.fillna(0)
+
+
+# Dividindo a tela em duas colunas
+col1, col2 = st.columns(2)
+
+with col1:
+    graph_dia_do_mes = px.line(
+        groupby_leads_dia_do_mes,
+        x='Dia',
+        y='id',
+        title='Leads por Dia do Mês',
+        labels={'id': 'Leads', 'Dia': 'Dia do mês'},
+        markers=True
+    )
+    st.plotly_chart(graph_dia_do_mes)
+
+with col2:
+    graph_por_loja = px.bar(
+        groupby_leads_por_store,
+        x='store',
+        y='id',
+        title='Leads por Loja',
+        labels={'id': 'Leads', 'store': 'store'},
+    )
+    st.plotly_chart(graph_por_loja)
+
+    # Dividindo em duas colunas para os gráficos de pizza
+col3, col4 = st.columns(2)
+
+with col3:
+    graph_por_source = px.pie(
+        groupby_leads_por_source,
+        names='source',
+        values='id',
+        title='Leads por source',
+        labels={'id': 'Leads', 'source': 'source'},
+    )
+    st.plotly_chart(graph_por_source)
+
+with col4:
+    graph_por_status_apnt = px.pie(
+        groupby_leads_por_status_apnt,
+        names='status_apnt',
+        values='id',
+        title='Leads por status_apnt',
+        labels={'id': 'Leads', 'status_apnt': 'status_apnt'},
+    )
+    st.plotly_chart(graph_por_status_apnt)
+
+# Criar um gráfico de linhas com múltiplas linhas (uma para cada store)
+df_pivot_melted = groupby_leads_por_store_dia_pivot.reset_index().melt(id_vars=['store'], var_name='Dia do mês', value_name='Leads')
+
+graph_evolucao_leads = px.line(
+    df_pivot_melted,
+    x='Dia do mês',
+    y='Número de Leads',
+    color='store',  # Diferenciar as linhas por store
+    title='Evolução dos Leads por store e Dia do Mês',
+    labels={'Número de Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
+    markers=True
+)
+st.plotly_chart(graph_evolucao_leads)
+
+# Mostrar a tabela pivotada
+st.write("Leads por store por Dia")
+st.dataframe(groupby_leads_por_store_dia_pivot_tabela)
+
+# Mostrar a tabela pivotada
+st.write("Leads por sources Marketing")
+st.dataframe(df_leads_concatenado)
