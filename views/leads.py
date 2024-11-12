@@ -9,19 +9,18 @@ import streamlit as st
 import plotly.express as px
 from streamlit_gsheets import GSheetsConnection
 
-# if page == "Leads":
 @st.cache_data()
-def load_main_dataframe(worksheet):
+def load_dataframe(worksheet):
     conn = st.connection("gsheets", type=GSheetsConnection)
     df = conn.read(worksheet=worksheet)
-    return df_leads
+    return df
 
-st.title("Pag 10 - Leads")
+st.title("Leads Carregados")
 
-# Carregar dados da planilha usando o ID e a aba 'data'
-spreadsheet_id = "1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc"
-df_leads = load_main_dataframe(spreadsheet_id, "data")
-st.write(df_leads)
+# Carregar dados da planilha no Google Sheets
+df_leads = load_dataframe("data")  # Usando a aba "data"
+st.session_state.setdefault("df_leads", df_leads)
+
 
 # Trabalhando com datas
 df_leads['Dia da entrada'] = pd.to_datetime(df_leads['Dia da entrada']) # trata estes dados como texto
