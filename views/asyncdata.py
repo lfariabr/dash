@@ -12,15 +12,19 @@ nest_asyncio.apply()
 # Define the Streamlit page
 st.title("Leads Self Service 3.0")
 
-# Create form for user inputs
-with st.form("input_form"):
-    start_date = st.date_input("Data inicial", value=datetime.today().replace(day=5))
-    end_date = st.date_input("Data final", value=datetime.today() - timedelta(days=1))
-    extended_end_date = st.date_input("Data agendamentos", value=datetime.today() + timedelta(days=15))
-    
-    token = st.text_input("Senha", type="password")
+# Define layout em duas colunas
+col1, col2 = st.columns(2)
 
-    # Submit button for the form
+with st.form("input_form"):
+    with col1:
+        start_date = st.date_input("Data inicial", value=datetime.today().replace(day=5))
+        end_date = st.date_input("Data final", value=datetime.today() - timedelta(days=1))
+    
+    with col2:
+        extended_end_date = st.date_input("Data agendamentos", value=datetime.today() + timedelta(days=15))
+        token = st.text_input("Senha", type="password")
+
+    # Submit button para o form
     submitted = st.form_submit_button("Pegar os Dados")
 
 # Placeholder for log area
@@ -455,28 +459,45 @@ if submitted:
         update_log("Tratando bill charges...")
         sales_results_list = []
         for data_row in df_bill_charges:
-            quote_id = data_row["quote"]["id"]
-            customer_data = data_row["quote"]["customer"]
-            customer_id = customer_data["id"]
-            store_name = data_row["store"]["name"]
-            total_amount = data_row["quote"]["bill"]["total"]
-            installments = data_row["quote"]["bill"].get("installmentsQuantity", "N/A")
-            paid_at = data_row.get("paidAt", "N/A")
-            status = data_row["quote"]["status"]
-            items = data_row["quote"]["bill"]["items"]
-            quote_items = "; ".join([f"{item['description']} (Qty: {item['quantity']}, Amount: {item['amount']})" for item in items])
+            quote = data_row.get("quote", {})
+            if isinstance(quote, dict):
+                # Extrair informações relevantes
+                quote_id = quote.get("id")
+                customer_data = quote.get("customer", {})
+                customer_id = customer_data.get("id")
+                customer_name = customer_data.get("name")
+                customer_taxvat = customer_data.get("taxvat", "N/A")
+                customer_email = customer_data.get("email")
 
-            results_row = [quote_id, customer_id, customer_data["name"], customer_data.get("taxvat", "N/A"),
-                          customer_data["email"], store_name, total_amount, installments, paid_at,
-                          data_row.get("dueAt", "N/A"), data_row["isPaid"], data_row["paymentMethod"]["name"],
-                          status, quote_items]
-            sales_results_list.append(results_row)
+                store_name = data_row.get("store", {}).get("name")
+                total_amount = quote.get("bill", {}).get("total")
+                installments = quote.get("bill", {}).get("installmentsQuantity", "N/A")
+                paid_at = data_row.get("paidAt", "N/A")
+                due_at = data_row.get("dueAt", "N/A")
+                is_paid = data_row.get("isPaid", False)
+                payment_method = data_row.get("paymentMethod", {}).get("name", "N/A")
+                status = quote.get("status")
 
+                # Combina todas as descrições de itens em uma única string
+                items = quote.get("bill", {}).get("items", [])
+                quote_items = "; ".join([f"{item['description']} (Qty: {item['quantity']}, Amount: {item['amount']})" for item in items])
+
+                # Adiciona a linha aos resultados
+                results_row = [
+                    quote_id, customer_id, customer_name, customer_taxvat, customer_email, store_name, 
+                    total_amount, installments, paid_at, due_at, is_paid, payment_method, status, quote_items
+                ]
+                sales_results_list.append(results_row)
+
+        # Cria o DataFrame com os resultados coletados
         df_bill_charges = pd.DataFrame(sales_results_list, columns=[
             "quote_id", "customer_id", "customer_name", "customer_taxvat", "customer_email",
             "store_name", "total_amount", "installments", "paid_at", "due_at", "is_paid",
             "payment_method", "status", "quote_items"
         ])
+
+        # Exibe o DataFrame resultante para verificação
+        st.write(df_bill_charges)
 
         # Merge Leads+Appointments com Bill Charges
         update_log("Mesclando leads e appointments com bill charges...")
