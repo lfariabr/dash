@@ -45,8 +45,12 @@ if submitted:
 
     # Update the log area with initial message
     update_log("Pedido recebido!")
-    update_log("")
+    time.sleep(2)  # Pausa de 2 segundos
+    update_log(" ")
+
     update_log("Processando os dados...")
+    time.sleep(2)  # Outra pausa de 2 segundos
+
     update_log("Acompanhe o progresso abaixo:")
 
     async def fetch_graphql(session, url, query, variables, token):
