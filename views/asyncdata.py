@@ -425,43 +425,95 @@ if submitted:
 
         # Merge Leads with Appointments
         update_log("Mesclando leads com appointments...")
-        reduced_assessment_columns = ['status_label', 'store_name', 'customer_id', 'startDate']
-        df_assessments_reduced = df_assessments[reduced_assessment_columns].rename(
-            columns={'status_label': 'status_apnt', 'store_name': 'store_apnt', 'startDate': 'startDate_apnt'}
-        )
+
+        reduced_assessment_columns = ['status_label', 'store_name', 'customer_id','startDate']
+        df_assessments_reduced = df_assessments[reduced_assessment_columns]
+        df_assessments_reduced.columns = ['status_apnt', 'store_apnt', 'customer_id','startDate_apnt']
         df_assessments_reduced['customer_id'] = pd.to_numeric(df_assessments_reduced['customer_id'], errors='coerce').astype('Int64')
 
-        df_assessments_reduced = df_assessments_reduced[df_assessments_reduced['status_apnt'] != "Reagendado"]
-        df_assessments_reduced_served = df_assessments_reduced[df_assessments_reduced['status_apnt'] == "Atendido"]
-        df_assessments_reduced_not_served = df_assessments_reduced[df_assessments_reduced['status_apnt'] != "Atendido"]
+        # Excluding status "REAGENDADO"
+        # SERVED assessments
+        # NOT SERVED assessments
+        df_assessments_reduced = df_assessments_reduced.loc[df_assessments_reduced['status_apnt'] != "Reagendado"]
+        df_assessments_reduced_served = df_assessments_reduced.loc[df_assessments_reduced['status_apnt'] == "Atendido"]
+        df_assessments_reduced_not_served = df_assessments_reduced.loc[df_assessments_reduced['status_apnt'] != "Atendido"]
 
+        # prep fields to merge
+        df_leads['customer_id'] = pd.to_numeric(df_leads['customer_id'], errors='coerce').astype('Int64')
+        df_assessments_reduced['customer_id'] = pd.to_numeric(df_assessments_reduced['customer_id'], errors='coerce').astype('Int64')
+
+        # Merging df_leads + df_assessments_reduced_served (status = ATENDIDO)
         df_leads_apnt_served = pd.merge(df_leads, df_assessments_reduced_served, on='customer_id', how='left')
         df_leads_apnt_served.loc[df_leads_apnt_served['store_apnt'].notnull(), 'is_served'] = True
 
+        # Merging df_leads_apnt_served with df_assessments_reduced_not_served, using suffixes to avoid column duplication
         df_leads_apnt_all = pd.merge(
             df_leads_apnt_served,
             df_assessments_reduced_not_served,
             on='customer_id',
             how='left',
-            suffixes=('_served', '_not_served')
+            suffixes=('_served', '_not_served')  # Adding suffixes to avoid column duplication
         )
 
-        # Limpeza dos dados pós-merge
+        ###############
+        # Cleaning pt 1
         df_leads_apnt_all['store_apnt'] = "to fill"
         df_leads_apnt_all.loc[df_leads_apnt_all['status_apnt_served'] == "Atendido", 'store_apnt'] = df_leads_apnt_all['store_apnt_served']
+
         df_leads_apnt_all.loc[
-            (df_leads_apnt_all['store_apnt'] == "to fill") & (df_leads_apnt_all['store_apnt_not_served'].notna()),
-            'store_apnt'
+          (df_leads_apnt_all['store_apnt'] == "to fill") &
+          (df_leads_apnt_all['store_apnt_not_served'].notna()),
+          'store_apnt'
         ] = df_leads_apnt_all['store_apnt_not_served']
 
+        df_leads_apnt_all.loc[
+          (df_leads_apnt_all['store_apnt'] == "to fill") &
+          (df_leads_apnt_all['store_apnt_served'].notna()),
+          'store_apnt'
+        ] = df_leads_apnt_all['status_apnt_served']
+
+        ###############
+        # Cleaning pt 2
         df_leads_apnt_all['status_apnt'] = "to fill"
         df_leads_apnt_all.loc[df_leads_apnt_all['status_apnt_served'] == "Atendido", 'status_apnt'] = "Atendido"
         df_leads_apnt_all.loc[(df_leads_apnt_all['status_apnt_not_served'].isna()) & (df_leads_apnt_all['status_apnt'] != "Atendido"), 'status_apnt'] = "Não está na agenda"
 
+        # For rows where 'status_apnt' is 'to fill' and 'status_apnt_not_served' is not NaN, update 'status_apnt' with 'status_apnt_not_served'
+        df_leads_apnt_all.loc[
+            (df_leads_apnt_all['status_apnt'] == "to fill") &
+            (df_leads_apnt_all['status_apnt_not_served'].notna()),
+            'status_apnt'
+        ] = df_leads_apnt_all['status_apnt_not_served']
+
+        df_leads_apnt_all.loc[df_leads_apnt_all['store_apnt'] == 'to fill', 'store_apnt'] = "Não está na agenda"
+
+        # Initialize the 'startDate_apnt' column with a placeholder value
+        df_leads_apnt_all['startDate_apnt'] = "to fill"
+
+        # Step 1: If the status is 'Atendido', fill 'startDate_apnt' with 'startDate_apnt_served'
+        df_leads_apnt_all.loc[df_leads_apnt_all['status_apnt_served'] == "Atendido", 'startDate_apnt'] = df_leads_apnt_all['startDate_apnt_served']
+
+        # Step 2: For rows where 'startDate_apnt' is 'to fill' and 'startDate_apnt_not_served' is not NaN, update 'startDate_apnt' with 'startDate_apnt_not_served'
+        df_leads_apnt_all.loc[
+            (df_leads_apnt_all['startDate_apnt'] == "to fill") &
+            (df_leads_apnt_all['startDate_apnt_not_served'].notna()),
+            'startDate_apnt'
+        ] = df_leads_apnt_all['startDate_apnt_not_served']
+
+        # Step 3: For rows where 'startDate_apnt' is 'to fill' and 'startDate_apnt_served' is not NaN, update 'startDate_apnt' with 'startDate_apnt_served'
+        df_leads_apnt_all.loc[
+            (df_leads_apnt_all['startDate_apnt'] == "to fill") &
+            (df_leads_apnt_all['startDate_apnt_served'].notna()),
+            'startDate_apnt'
+        ] = df_leads_apnt_all['startDate_apnt_served']
+
+        # List of columns to drop (duplicates)
         columns_to_drop = [
             'status_apnt_served', 'store_apnt_served', 'startDate_apnt_served',
             'status_apnt_not_served', 'store_apnt_not_served', 'startDate_apnt_not_served'
         ]
+
+        # Drop the columns from the DataFrame
         df_leads_apnt_all.drop(columns=columns_to_drop, inplace=True)
 
         # Tratando Bill Charges
@@ -590,6 +642,8 @@ if submitted:
     from gspread_dataframe import set_with_dataframe
     import json
 
+    scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+
     # Assemble credentials from Streamlit secrets
     creds_dict = {
         "type": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["type"],
@@ -604,7 +658,7 @@ if submitted:
         "client_x509_cert_url": st.secrets["GOOGLE_SERVICE_ACCOUNT"]["client_x509_cert_url"]
     }
 
-    creds = Credentials.from_service_account_info(creds_dict)
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
     gc = gspread.authorize(creds)
 
     # Interact with Google Sheets
