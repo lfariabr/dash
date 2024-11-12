@@ -14,11 +14,11 @@ st.title("Leads Self Service 3.0")
 
 # Create form for user inputs
 with st.form("input_form"):
-    start_date = st.date_input("Start Date", value=datetime.today().replace(day=1))
-    end_date = st.date_input("End Date", value=datetime.today() - timedelta(days=1))
-    extended_end_date = st.date_input("Extended End Date", value=datetime.today() + timedelta(days=15))
+    start_date = st.date_input("Data inicial", value=datetime.today().replace(day=5))
+    end_date = st.date_input("Data final", value=datetime.today() - timedelta(days=1))
+    extended_end_date = st.date_input("Data agendamentos", value=datetime.today() + timedelta(days=15))
     
-    token = st.text_input("API Token", type="password")
+    token = st.text_input("Senha", type="password")
 
     # Submit button for the form
     submitted = st.form_submit_button("Pegar os Dados")
