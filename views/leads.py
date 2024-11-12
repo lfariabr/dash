@@ -12,17 +12,18 @@ from streamlit_gsheets import GSheetsConnection
 # if page == "Leads":
 
 @st.cache_data
-def load_main_dataframe(worksheet_name):
-    # Conecte-se ao Google Sheets usando a configuração definida nas variáveis de ambiente
+def load_main_dataframe(spreadsheet_id, worksheet_name):
+    # Conecte-se ao Google Sheets usando o ID da planilha
     conn = st.connection("gsheets", type=GSheetsConnection)
-    # Leia os dados da aba especificada
+    conn._connect(spreadsheet_id=spreadsheet_id)  # Especifica o ID da planilha manualmente
     df_leads = conn.read(worksheet=worksheet_name)
     return df_leads
 
 st.title("Pag 10 - Leads")
 
-# Carregar dados da aba 'data'
-df_leads = load_main_dataframe("data")
+# Carregar dados da planilha usando o ID e a aba 'data'
+spreadsheet_id = "1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc"
+df_leads = load_main_dataframe(spreadsheet_id, "data")
 st.write(df_leads)
 
 # Trabalhando com datas
