@@ -10,7 +10,7 @@ import time
 nest_asyncio.apply()
 
 # Define the Streamlit page
-st.title("GraphQL Data Fetching Interface")
+st.title("Leads X Agenda X Vendas - Self Service 3.0")
 
 # Create form for user inputs
 with st.form("input_form"):
