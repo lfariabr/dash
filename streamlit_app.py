@@ -4,20 +4,20 @@ import streamlit as st
 # --- PAGE SETUP ---
 graphics = st.Page(
     "views/leads.py",
-    title="💡 Análise de Leads",
-    icon=":bar_chart:",
+    title="Leads",
+    icon="📊",  # Emoji padrão de gráfico de barra
 )
 
 asyncdata = st.Page(
     "views/asyncdata.py",
-    title="🔥 Marketing Leads",
-    icon=":chart_with_upwards_trend:",
+    title="Marketing Leads",
+    icon="📈",  # Emoji padrão de gráfico de linha
 )
 
-# --- CONFIGURAÇÃO DE NAVEGAÇÃO ---
+# --- NAVIGATION SETUP [WITH SECTIONS] ---
 pg = st.navigation(
     {
-        "📊 Painel Principal": [asyncdata, graphics],
+        "📁 Menu": [asyncdata, graphics],  # Incluindo um emoji de pasta para o menu principal
     }
 )
 
