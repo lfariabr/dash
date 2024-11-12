@@ -21,20 +21,21 @@ with st.form("input_form"):
     token = st.text_input("API Token", type="password")
 
     # Submit button for the form
-    submitted = st.form_submit_button("Fetch Data")
+    submitted = st.form_submit_button("Pegar os Dados")
 
 # Log area in Streamlit to show output
 log_area = st.empty()  # This will be used to display real-time logs
 
 # If the form is submitted, run the fetching logic
 if submitted:
-    # Format dates to match the required format
-    start_date_str = start_date.strftime('%Y-%m-%d')
-    end_date_str = end_date.strftime('%Y-%m-%d')
-    extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
+    with st.spinner("Loading... Please wait while the data is being fetched."):
+        # Format dates to match the required format
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+        extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
 
-    # Print formatted dates
-    log_area.text(f"Start Date: {start_date_str}\nEnd Date: {end_date_str}\nExtended End Date: {extended_end_date_str}")
+        # Print formatted dates
+        log_area.text(f"Start Date: {start_date_str}\nEnd Date: {end_date_str}\nExtended End Date: {extended_end_date_str}")
 
     async def fetch_graphql(session, url, query, variables, token):
         headers = {
