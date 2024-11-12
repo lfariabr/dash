@@ -73,7 +73,7 @@ if submitted:
                             return None
                         return data
                     else:
-                        update_log(f"O download falhou devido: {response.status}")
+                        update_log(f"Ops... erro {response.status}!")
             except aiohttp.ClientError as e:
                 update_log(f"Request exception: {e}")
 
@@ -132,7 +132,7 @@ if submitted:
                 },
                 'pagination': {
                     'currentPage': current_page,
-                    'perPage': 200,
+                    'perPage': 120,
                 },
             }
 
@@ -208,7 +208,7 @@ if submitted:
                 },
                 'pagination': {
                     'currentPage': current_page,
-                    'perPage': 200,
+                    'perPage': 120,
                 },
             }
 
@@ -306,7 +306,7 @@ if submitted:
                 },
                 'pagination': {
                     'currentPage': current_page,
-                    'perPage': 200,
+                    'perPage': 120,
                 }
             }
 

@@ -12,24 +12,18 @@ from streamlit_gsheets import GSheetsConnection
 # if page == "Leads":
 
 @st.cache_data
-def load_main_dataframe(worksheet):
+def load_main_dataframe(sheet_name="data"):
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    df_leads = conn.read(worksheet=sheet_name)  # lê os dados da aba "data"
+    return df_leads
 
-  conn = st.connection("gsheets", type=GSheetsConnection)
-  df_leads = conn.read(worksheet=worksheet) # dtype={"Ad ID": str}
-
-  return df_leads
-
-st.title("Pag 10 - Leads")
+st.title("Leads Carregados")
 
 # leads = 'leads.xlsx'
-df_leads = load_main_dataframe('worksheet')
+df_leads = load_main_dataframe()
 
-# Trabalhando com datas
-df_leads['Dia da entrada'] = pd.to_datetime(df_leads['Dia da entrada']) # trata estes dados como texto
-df_leads['Dia do mês'] = df_leads['Dia da entrada'].dt.day_name()
-
-# Extrair o dia do mês de 'Dia da entrada'
-df_leads['Dia'] = df_leads['Dia da entrada'].dt.day
+# Extrair o Dia de 'Dia da entrada'
+df_leads['Dia'] = df_leads['createdAt'].dt.day
 
 # Deixando apenas Pró-Corpo
 lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
@@ -75,8 +69,8 @@ with col1:
         groupby_leads_dia_do_mes,
         x='Dia',
         y='ID do lead',
-        title='Número de Leads por Dia do Mês',
-        labels={'ID do lead': 'Número de Leads', 'Dia': 'Dia do mês'},
+        title='Número de Leads por Dia',
+        labels={'ID do lead': 'Número de Leads', 'Dia': 'Dia'},
         markers=True
     )
     st.plotly_chart(graph_dia_do_mes)
@@ -115,15 +109,15 @@ with col4:
     st.plotly_chart(graph_por_status)
 
 # Criar um gráfico de linhas com múltiplas linhas (uma para cada unidade)
-df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia do mês', value_name='Número de Leads')
+df_pivot_melted = groupby_leads_por_unidade_dia_pivot.reset_index().melt(id_vars=['Unidade'], var_name='Dia', value_name='Número de Leads')
 
 graph_evolucao_leads = px.line(
     df_pivot_melted,
-    x='Dia do mês',
+    x='Dia',
     y='Número de Leads',
     color='Unidade',  # Diferenciar as linhas por unidade
-    title='Evolução dos Leads por Unidade e Dia do Mês',
-    labels={'Número de Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
+    title='Evolução dos Leads por Unidade e Dia',
+    labels={'Número de Leads': 'Número de Leads', 'Dia': 'Dia'},
     markers=True
 )
 st.plotly_chart(graph_evolucao_leads)
