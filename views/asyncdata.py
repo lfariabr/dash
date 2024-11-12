@@ -22,7 +22,7 @@ with st.form("input_form"):
         end_date = st.date_input("Data final", value=datetime.today() - timedelta(days=1))
 
     with col2:
-        extended_end_date = st.date_input("Data agendamentos", value=datetime.today() + timedelta(days=15))
+        extended_end_date = st.date_input("Data da Agenda", value=datetime.today() + timedelta(days=15))
         token = st.text_input("Senha", type="password")
 
     # Submit button para o form

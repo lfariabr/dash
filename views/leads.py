@@ -12,9 +12,9 @@ from streamlit_gsheets import GSheetsConnection
 # if page == "Leads":
 
 @st.cache_data
-def load_main_dataframe(sheet_name="data"):
+def load_main_dataframe(data):
     conn = st.connection("gsheets", type=GSheetsConnection)
-    df_leads = conn.read(worksheet=sheet_name)  # lê os dados da aba "data"
+    df_leads = conn.read(worksheet=data)  # lê os dados da aba "data"
     return df_leads
 
 st.title("Leads Carregados")
