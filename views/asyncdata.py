@@ -39,12 +39,15 @@ if submitted:
     extended_end_date_str = extended_end_date.strftime('%Y-%m-%d')
 
     # Print formatted dates directly on the screen (outside log area) with smaller font
-    st.markdown(f"<p style='font-size:10px'>Data inicial: {start_date_str}</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:10px'>Data final: {end_date_str}</p>", unsafe_allow_html=True)
-    st.markdown(f"<p style='font-size:10px'>Data agendamentos: {extended_end_date_str}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:11px'>Data inicial: {start_date_str}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:11px'>Data final: {end_date_str}</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='font-size:11px'>Data agendamentos: {extended_end_date_str}</p>", unsafe_allow_html=True)
 
     # Update the log area with initial message
-    update_log("Aguarde, os dados estão sendo processados...")
+    update_log("Pedido recebido!")
+    update_log("")
+    update_log("Processando os dados...")
+    update_log("Acompanhe o progresso abaixo:")
 
     async def fetch_graphql(session, url, query, variables, token):
         headers = {
