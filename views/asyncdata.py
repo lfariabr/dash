@@ -17,7 +17,7 @@ col1, col2 = st.columns(2)
 
 with st.form("input_form"):
     with col1:
-        start_date = st.date_input("Data inicial", value=datetime.today().replace(day=5))
+        start_date = st.date_input("Data inicial", value=datetime.today().replace(day=2))
         end_date = st.date_input("Data final", value=datetime.today() - timedelta(days=1))
     
     with col2:
@@ -458,38 +458,37 @@ if submitted:
         # Tratando Bill Charges
         update_log("Tratando bill charges...")
         sales_results_list = []
-        for data_row in df_bill_charges:
-            quote = data_row.get("quote", {})
-            if isinstance(quote, dict):
-                # Extrair informações relevantes
-                quote_id = quote.get("id")
-                customer_data = quote.get("customer", {})
-                customer_id = customer_data.get("id")
-                customer_name = customer_data.get("name")
-                customer_taxvat = customer_data.get("taxvat", "N/A")
-                customer_email = customer_data.get("email")
+        for data_row in bill_charges_data:
+            # Extract relevant information
+            quote_id = data_row["quote"]["id"]
+            customer_data = data_row["quote"]["customer"]
+            customer_id = customer_data["id"]  # Extracting customer_id
+            customer_name = customer_data["name"]
+            customer_taxvat = customer_data.get("taxvat", "N/A")  # Use get() to handle missing keys
+            customer_email = customer_data["email"]
 
-                store_name = data_row.get("store", {}).get("name")
-                total_amount = quote.get("bill", {}).get("total")
-                installments = quote.get("bill", {}).get("installmentsQuantity", "N/A")
-                paid_at = data_row.get("paidAt", "N/A")
-                due_at = data_row.get("dueAt", "N/A")
-                is_paid = data_row.get("isPaid", False)
-                payment_method = data_row.get("paymentMethod", {}).get("name", "N/A")
-                status = quote.get("status")
+            store_name = data_row["store"]["name"]
+            total_amount = data_row["quote"]["bill"]["total"]
+            installments = data_row["quote"]["bill"].get("installmentsQuantity", "N/A")  # Handle missing keys
+            paid_at = data_row.get("paidAt", "N/A")
+            due_at = data_row.get("dueAt", "N/A")
+            is_paid = data_row["isPaid"]
+            payment_method = data_row["paymentMethod"]["name"]
+            status = data_row["quote"]["status"]
 
-                # Combina todas as descrições de itens em uma única string
-                items = quote.get("bill", {}).get("items", [])
-                quote_items = "; ".join([f"{item['description']} (Qty: {item['quantity']}, Amount: {item['amount']})" for item in items])
+            # Combine all items descriptions in one string
+            items = data_row["quote"]["bill"]["items"]
+            quote_items = "; ".join([f"{item['description']} (Qty: {item['quantity']}, Amount: {item['amount']})" for item in items])
 
-                # Adiciona a linha aos resultados
-                results_row = [
-                    quote_id, customer_id, customer_name, customer_taxvat, customer_email, store_name, 
-                    total_amount, installments, paid_at, due_at, is_paid, payment_method, status, quote_items
-                ]
-                sales_results_list.append(results_row)
+            # Append the row to the results list
+            results_row = [
+                quote_id, customer_id, customer_name, customer_taxvat, customer_email, 
+                store_name, total_amount, installments, paid_at, due_at, is_paid, 
+                payment_method, status, quote_items
+            ]
+            sales_results_list.append(results_row)
 
-        # Cria o DataFrame com os resultados coletados
+        # Create the DataFrame with the collected results
         df_bill_charges = pd.DataFrame(sales_results_list, columns=[
             "quote_id", "customer_id", "customer_name", "customer_taxvat", "customer_email",
             "store_name", "total_amount", "installments", "paid_at", "due_at", "is_paid",
