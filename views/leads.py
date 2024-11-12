@@ -50,8 +50,8 @@ st.write(df_leads)
 df_leads['createdAt'] = pd.to_datetime(df_leads['createdAt']) # trata estes dados como texto
 df_leads['Dia do mês'] = df_leads['createdAt'].dt.day_name()
 
-# Extrair o dia do mês de 'Dia da entrada'
-df_leads['Dia'] = df_leads['Dia da entrada'].dt.day
+# Extrair o dia do mês de 'createdAt'
+df_leads['Dia'] = df_leads['createdAt'].dt.day
 
 # Deixando apenas Pró-Corpo
 lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
