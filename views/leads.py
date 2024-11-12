@@ -47,8 +47,8 @@ st.title("Dados Carregados do Google Sheets")
 st.write(df_leads)
 
 # Trabalhando com datas
-df_leads['Dia da entrada'] = pd.to_datetime(df_leads['Dia da entrada']) # trata estes dados como texto
-df_leads['Dia do mês'] = df_leads['Dia da entrada'].dt.day_name()
+df_leads['createdAt'] = pd.to_datetime(df_leads['createdAt']) # trata estes dados como texto
+df_leads['Dia do mês'] = df_leads['createdAt'].dt.day_name()
 
 # Extrair o dia do mês de 'Dia da entrada'
 df_leads['Dia'] = df_leads['Dia da entrada'].dt.day
