@@ -23,12 +23,14 @@ with st.form("input_form"):
     # Submit button for the form
     submitted = st.form_submit_button("Pegar os Dados")
 
-# Log area in Streamlit to show output
+# Placeholder for visual spinner and log area
+spinner_placeholder = st.empty()  # This will hold the spinner
 log_area = st.empty()  # This will be used to display real-time logs
 
 # If the form is submitted, run the fetching logic
 if submitted:
-    with st.spinner("Loading... Please wait while the data is being fetched."):
+    with spinner_placeholder.spinner("🔄 Carregando... Por favor, aguarde enquanto os dados estão sendo buscados."):
+        # Format dates to match the required format
         # Format dates to match the required format
         start_date_str = start_date.strftime('%Y-%m-%d')
         end_date_str = end_date.strftime('%Y-%m-%d')
