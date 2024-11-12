@@ -582,3 +582,31 @@ if submitted:
     # Exemplo de chamada da função de processamento, com logs sendo exibidos em tempo real
     df_mkt_result = process_data(df_leads, df_appointments, df_bill_charges)
     st.write(df_mkt_result)
+
+    update_log("Salvando dados no Google Sheets...")
+    # Google Sheets and Colab setup
+    import gspread
+    from google.colab import drive, auth
+    from google.auth import default
+    from gspread_dataframe import set_with_dataframe
+
+    # Authenticate and set up Google Sheets access
+    auth.authenticate_user()
+    creds, _ = default()
+    gc = gspread.authorize(creds)
+
+    # Mount Google Drive (optional if you need access to Google Drive files)
+    drive.mount('/content/drive')
+
+    # Define the Google Sheets URL and open it
+    url_to_paste = 'https://docs.google.com/spreadsheets/d/1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc/'
+    spreadsheet = gc.open_by_url(url_to_paste)
+
+    # Select the worksheet named 'data'
+    sheet_data = spreadsheet.worksheet('data')
+
+    # Clear existing data in the worksheet
+    sheet_data.clear()
+
+    # Write your DataFrame to Google Sheets
+    set_with_dataframe(sheet_data, df_mkt_result)
