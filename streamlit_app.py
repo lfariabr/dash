@@ -10,13 +10,13 @@ graphics = st.Page(
 
 asyncdata = st.Page(
     "views/asyncdata.py",
-    title="Data Async",
+    title="Marketing Leads",
     icon=":material/overview:",
 )
 # --- NAVIGATION SETUP [WITH SECTIONS]---
 pg = st.navigation(
     {
-        "Marketing": [asyncdata, graphics],
+        "Menu": [asyncdata, graphics],
         # "Async": [asyncdata]
         # "Teste2": [test_page2],
     }
