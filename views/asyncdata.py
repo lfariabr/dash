@@ -10,7 +10,8 @@ import time
 nest_asyncio.apply()
 
 # Define the Streamlit page
-st.title("Leads Self Service v3.0")
+st.title("Leads Self Service")
+st.write("v3.0.0")
 
 # Define layout em duas colunas
 col1, col2 = st.columns(2)
@@ -148,7 +149,7 @@ if submitted:
             meta = data['data']['fetchLeads']['meta']
             last_page = meta['lastPage']
 
-            update_log(f"Baixando Leads. Pág: {current_page}/{last_page}. De: {start_date} - Até: {end_date}")
+            update_log(f"Baixando Leads. Pág: {current_page}/{last_page}.") # De: {start_date} - Até: {end_date}
 
             if current_page >= last_page:
                 break
@@ -243,7 +244,7 @@ if submitted:
             meta = data['data']['fetchAppointments']['meta']
             last_page = meta['lastPage']
 
-            update_log(f"Baixando Agendamentos. Pág. {current_page}/{last_page}. De: {start_date} - Até: {extended_end_date}")
+            update_log(f"Baixando Agendamentos. Pág. {current_page}/{last_page}.") # De: {start_date} - Até: {extended_end_date}
 
             if current_page >= last_page:
                 break
@@ -320,7 +321,7 @@ if submitted:
             all_bill_charges.extend(bill_charges_data)
 
             meta = data['data']['fetchBillCharges']['meta']
-            update_log(f"Baixando Vendas. Pág. {current_page}/{meta['lastPage']}. De: {start_date} - Até: {end_date}")
+            update_log(f"Baixando Vendas. Pág. {current_page}/{meta['lastPage']}.") # De: {start_date} - Até: {end_date}
             last_page = meta['lastPage']
 
             if current_page >= last_page:
@@ -354,21 +355,21 @@ if submitted:
     # Exibir os dados obtidos no Streamlit
     if leads_data:
         df_leads = pd.DataFrame(leads_data)
-        st.write(f"Total leads: {df_leads.shape[0]} resultados")
+        st.write(f"Total de Leads: {df_leads.shape[0]} resultados")
         # st.write(df_leads)
     else:
         update_log("No leads data fetched or an error occurred during the fetch.")
 
     if appointments_data:
         df_appointments = pd.DataFrame(appointments_data)
-        st.write(f"Total Agendamentos: {df_appointments.shape[0]} resultados")
+        st.write(f"Total de Agendamentos: {df_appointments.shape[0]} resultados")
         # st.write(df_appointments)
     else:
         update_log("No appointments data fetched or an error occurred during the fetch.")
 
     if bill_charges_data:
         df_bill_charges = pd.DataFrame(bill_charges_data)
-        st.write(f"Total Vendas: {df_bill_charges.shape[0]} resultados")
+        st.write(f"Total de Vendas: {df_bill_charges.shape[0]} resultados")
         # st.write(df_bill_charges)
     else:
         update_log("No bill charges data fetched or an error occurred during the fetch.")

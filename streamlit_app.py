@@ -4,13 +4,13 @@ import streamlit as st
 # --- PAGE SETUP ---
 graphics = st.Page(
     "views/leads.py",
-    title="Leads",
+    title="Conferir dados",
     icon="📊",  # Emoji padrão de gráfico de barra
 )
 
 asyncdata = st.Page(
     "views/asyncdata.py",
-    title="Marketing Leads",
+    title="Baixar dados",
     icon="📈",  # Emoji padrão de gráfico de linha
 )
 
