@@ -351,27 +351,36 @@ if submitted:
     # Exibir os dados obtidos no Streamlit
     if leads_data:
         df_leads = pd.DataFrame(leads_data)
-        st.write(f"Leads DataFrame: {df_leads.shape[0]} rows")
-        st.write(df_leads)
+        st.write(f"Total leads: {df_leads.shape[0]} resultados")
+        # st.write(df_leads)
     else:
         update_log("No leads data fetched or an error occurred during the fetch.")
 
     if appointments_data:
         df_appointments = pd.DataFrame(appointments_data)
-        st.write(f"Appointments DataFrame: {df_appointments.shape[0]} rows")
-        st.write(df_appointments)
+        st.write(f"Total Agendamentos: {df_appointments.shape[0]} resultados")
+        # st.write(df_appointments)
     else:
         update_log("No appointments data fetched or an error occurred during the fetch.")
 
     if bill_charges_data:
         df_bill_charges = pd.DataFrame(bill_charges_data)
-        st.write(f"Bill Charges DataFrame: {df_bill_charges.shape[0]} rows")
-        st.write(df_bill_charges)
+        st.write(f"Total Vendas: {df_bill_charges.shape[0]} resultados")
+        # st.write(df_bill_charges)
     else:
         update_log("No bill charges data fetched or an error occurred during the fetch.")
 
     # Função principal para tratar e processar os dados
     def process_data(df_leads, df_appointments, df_bill_charges):
+
+        update_log("Todos os dados foram baixados. com sucesso")
+        update_log("___")
+        time.sleep(10)
+
+        update_log("Processando os dados...")
+        time.sleep(10)
+        update_log("___")
+
         # Tratando Leads
         update_log("Tratando leads...")
         leads_results_list = []
@@ -495,9 +504,6 @@ if submitted:
             "payment_method", "status", "quote_items"
         ])
 
-        # Exibe o DataFrame resultante para verificação
-        st.write(df_bill_charges)
-
         # Merge Leads+Appointments com Bill Charges
         update_log("Mesclando leads e appointments com bill charges...")
         reduced_billcharges_columns = ['customer_id', 'total_amount', 'paid_at', 'quote_items', 'installments']
@@ -568,12 +574,6 @@ if submitted:
         df_mkt.loc[(df_mkt['message'] == 'Lead Pop Up de Saída. Ganhou Peeling Diamante.') & (df_mkt['category'] == 'Indefinido'), 'category'] = 'Cortesia PopUpSaida Peeling_D'
         df_mkt.loc[(df_mkt['message'] == 'Lead Pop Up de Saída. Ganhou Massagem Modeladora.') & (df_mkt['category'] == 'Indefinido'), 'category'] = 'Cortesia PopUpSaida Mass_Mod'
         df_mkt.loc[(df_mkt['message'] == 'Lead salvo pelo modal de WhatsApp da Isa') & (df_mkt['category'] == 'Indefinido'), 'category'] = 'Quer Falar no Whatsapp'
-
-        # Exibir as contagens de categorias no log
-        category_counts = df_mkt['category'].value_counts()
-        update_log("Contagem de categorias:")
-        for category, count in category_counts.items():
-            update_log(f"{category}: {count}")
 
         # Dados finais prontos
         update_log("Processamento concluído com sucesso.")
