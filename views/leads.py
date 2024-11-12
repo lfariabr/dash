@@ -8,6 +8,7 @@ import json
 import streamlit as st
 import plotly.express as px
 from streamlit_gsheets import GSheetsConnection
+from google.oauth2.service_account import Credentials
 from gspread_dataframe import get_as_dataframe
 
 
