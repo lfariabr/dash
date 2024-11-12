@@ -13,8 +13,9 @@ from streamlit_gsheets import GSheetsConnection
 
 @st.cache_data
 def load_main_dataframe(worksheet_name):
-    # Estabelece conexão e lê os dados
-    conn = st.connection("gsheets", type=GSheetsConnection, spreadsheet="1Z5TaQavOU5GaJp96X_cR_TA-gw6ZTOjV4hYTqBQwwCc")
+    # Conecte-se ao Google Sheets usando a configuração definida nas variáveis de ambiente
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    # Leia os dados da aba especificada
     df_leads = conn.read(worksheet=worksheet_name)
     return df_leads
 
