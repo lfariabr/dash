@@ -42,15 +42,12 @@ def load_data_from_gsheet():
 def run():
   df_leads = load_data_from_gsheet()
 
-
-  # Criar filtros com seleção múltipla para 'source', 'store' e 'category'
-  col5, col6, col7 = st.columns(3)
-  with col5:
-    selected_sources = st.multiselect('Select Source', options=df_leads['source'].unique(), default=df_leads['source'].unique())
-  with col6:
-    selected_stores = st.multiselect('Select Store', options=df_leads['store'].unique(), default=df_leads['store'].unique())
-  with col7:
-    selected_categories = st.multiselect('Select Category', options=df_leads['category'].unique(), default=df_leads['category'].unique())
+  # Aplicar os filtros
+  filtered_data = df_leads[
+      (df_leads['source'].isin(selected_sources)) &
+      (df_leads['store'].isin(selected_stores)) &
+      (df_leads['category'].isin(selected_categories))
+  ]
 
   # Aplicar filtros
   filtered_data = df_leads[df_leads['source'].isin(selected_sources) & df_leads['store'].isin(selected_stores) & df_leads['category'].isin(selected_categories)]
