@@ -48,19 +48,19 @@ def run():
   col5, col6, col7 = st.columns(3)
   with col5:
     all_sources = ['Todas'] + list(df_leads['source'].unique())
-    selected_sources = st.multiselect('Select Source', options=all_sources, default='Todas')
+    selected_sources = st.multiselect('Filtro de Fonte', options=all_sources, default='Todas')
     if 'Todas' in selected_sources:
         selected_sources = all_sources[1:]  # Exclui "Todas" para usar todas as fontes
 
   with col6:
       all_stores = ['Todas'] + list(df_leads['store'].unique())
-      selected_stores = st.multiselect('Select Store', options=all_stores, default='Todas')
+      selected_stores = st.multiselect('Filtro de Unidade', options=all_stores, default='Todas')
       if 'Todas' in selected_stores:
           selected_stores = all_stores[1:]  # Exclui "Todas" para usar todas as lojas
 
   with col7:
       all_categories = ['Todas'] + list(df_leads['category'].unique())
-      selected_categories = st.multiselect('Select Category', options=all_categories, default='Todas')
+      selected_categories = st.multiselect('Filtro de Categoria', options=all_categories, default='Todas')
       if 'Todas' in selected_categories:
           selected_categories = all_categories[1:]  # Exclui "TUDO" para usar todas as categorias
     
