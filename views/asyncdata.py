@@ -10,7 +10,7 @@ import time
 nest_asyncio.apply()
 
 # Define the Streamlit page
-st.title("Leads S.S. - Download")
+st.title("Leads S.S. - Downloading")
 st.write("v3.0.0")
 
 def run():
@@ -412,6 +412,7 @@ def run():
               leads_results_list.append(formatted_row)
 
           df_leads = pd.DataFrame(leads_results_list)
+          st.write(df_leads.dtypes)
 
           # Tratamentos especiais para leads
           df_leads.loc[df_leads['customer_id'].isna(), 'customer_id'] = "Not found"
