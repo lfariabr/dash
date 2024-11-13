@@ -41,6 +41,9 @@ def load_data_from_gsheet():
 def run():
   df_leads = load_data_from_gsheet()
 
+  st.title("Leads S.S. - Gráficos")
+  st.write("v1.0.0")
+
   # Criar filtros com seleção múltipla para 'source', 'store' e 'category'
   col5, col6, col7 = st.columns(3)
   with col5:
@@ -64,8 +67,7 @@ def run():
   # Aplicar filtros
   filtered_data = df_leads[df_leads['source'].isin(selected_sources) & df_leads['store'].isin(selected_stores) & df_leads['category'].isin(selected_categories)]
 
-  st.title("Leads Self Service")
-  st.write("v1.0.0")
+
 
   # Data Prep: Filtering
   filtered_data['createdAt'] = pd.to_datetime(filtered_data['createdAt']) # trata estes dados como texto
