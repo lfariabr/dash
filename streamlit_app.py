@@ -8,11 +8,11 @@ st.set_page_config(page_title="Dashboard de Leads", layout="wide")
 from views import leads, asyncdata
 
 # --- SIDEBAR SETUP ---
-st.sidebar.markdown("# 📁 Menu")
+st.sidebar.markdown("## 📁 Menu")
 # Criação dos botões de rádio para a navegação
 choice = st.sidebar.radio("Escolha uma página:", ['Gráficos', 'Download'])
-
-st.sidebar.markdown("### Notas")
+st.write("___")
+st.sidebar.markdown("### 💎 Observações")
 st.sidebar.write("É possível fazer o download dos dados e visualizar os resultados em tempo real!")
 
 # Condicional para executar páginas específicas com base na escolha
