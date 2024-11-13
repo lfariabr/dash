@@ -404,7 +404,7 @@ def run():
                   'utmContent': lead['utmContent'],
                   'utmSearch': lead['utmSearch'],
                   'utmTerm': lead['utmTerm'],
-                  'message': lead['message'],
+                  'message': str(lead['message']),
                   'customer_id': lead['customer']['id'] if lead['customer'] else None,
                   'customer_name': lead['customer']['name'] if lead['customer'] else None,
               }
