@@ -64,7 +64,7 @@ groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia_pivot_tab
 
 # Tabelas finais
 sources_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
-sources_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica']
+sources_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica', 'Acesso Direto ao Site']
 
 df_leads_pagas = df_leads.loc[df_leads['source'].isin(sources_pagas)]
 df_leads_org = df_leads.loc[df_leads['source'].isin(sources_org)]
@@ -141,12 +141,12 @@ graph_evolucao_leads = px.line(
 st.plotly_chart(graph_evolucao_leads)
 
 # Mostrar a tabela pivotada
-st.write("Leads por Loja por Dia")
-st.dataframe(groupby_leads_por_store_dia_pivot_tabela)
+st.write("Leads por Fonte de Marketing")
+st.dataframe(df_leads_concatenado)
 
 # Mostrar a tabela pivotada
-st.write("Leads por Fonte Marketing")
-st.dataframe(df_leads_concatenado)
+st.write("Leads por Loja por Dia")
+st.dataframe(groupby_leads_por_store_dia_pivot_tabela)
 
 # Exibir o dataframe
 st.write("Dados brutos")
