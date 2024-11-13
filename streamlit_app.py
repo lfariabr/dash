@@ -2,7 +2,7 @@
 import streamlit as st
 
 # Configuração inicial da página
-st.set_page_config(page_title="Dashboard de Leads", layout="wide")
+st.set_page_config(page_title="Dashboard Marketing", layout="wide")
 
 # Importação dos scripts de página após a configuração inicial
 from views import leads, asyncdata
