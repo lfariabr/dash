@@ -1,11 +1,11 @@
 
 import streamlit as st
 
-# Importação dos scripts de página
-from views import leads, asyncdata
-
-# Configuração da página
+# Configuração inicial da página
 st.set_page_config(page_title="Dashboard de Leads", layout="wide")
+
+# Importação dos scripts de página após a configuração inicial
+from views import leads, asyncdata
 
 # --- SIDEBAR SETUP ---
 st.sidebar.markdown("# 📁 Menu")
@@ -20,6 +20,3 @@ if choice == 'Conferir dados':
     leads.run()
 elif choice == 'Baixar dados':
     asyncdata.run()
-
-# As funções run() em leads.py e asyncdata.py precisarão ser definidas
-# para incluir toda a lógica que estava anteriormente dentro do contexto da página.
