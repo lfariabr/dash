@@ -14,7 +14,7 @@ from gspread_dataframe import get_as_dataframe
 
 
 # Função para carregar dados do Google Sheets
-@st.cache(allow_output_mutation=True)
+@st.cache_data(ttl=600)  # Optional: ttl parameter caches data for 600 seconds
 def load_data_from_gsheet():
     # Autenticar com Google usando as credenciais do secrets
     scopes = ["https://www.googleapis.com/auth/spreadsheets"]
