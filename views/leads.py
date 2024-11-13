@@ -40,24 +40,33 @@ def load_data_from_gsheet():
     return data.dropna(how='all', axis=1)  # Limpa colunas totalmente vazias
 
 df_leads = load_data_from_gsheet()
+
+# Criar filtros com seleção múltipla para 'source', 'store' e 'category'
+selected_sources = st.multiselect('Select Source', options=df_leads['source'].unique(), default=df_leads['source'].unique())
+selected_stores = st.multiselect('Select Store', options=df_leads['store'].unique(), default=df_leads['store'].unique())
+selected_categories = st.multiselect('Select Category', options=df_leads['category'].unique(), default=df_leads['category'].unique())
+
+# Aplicar filtros
+filtered_data = df_leads[df_leads['source'].isin(selected_sources) & df_leads['store'].isin(selected_stores) & df_leads['category'].isin(selected_categories)]
+
 st.title("Leads Self Service")
 st.write("v1.0.0")
 
 # Data Prep: Filtering
-df_leads['createdAt'] = pd.to_datetime(df_leads['createdAt']) # trata estes dados como texto
-df_leads['Dia do mês'] = df_leads['createdAt'].dt.day_name()
-df_leads['Dia'] = df_leads['createdAt'].dt.day
+filtered_data['createdAt'] = pd.to_datetime(filtered_data['createdAt']) # trata estes dados como texto
+filtered_data['Dia do mês'] = filtered_data['createdAt'].dt.day_name()
+filtered_data['Dia'] = filtered_data['createdAt'].dt.day
 lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
-df_leads = df_leads[~df_leads['store'].isin(lista_lojas_excluir)]
+filtered_data = filtered_data[~filtered_data['store'].isin(lista_lojas_excluir)]
 
 # Gráficos
-groupby_leads_dia_do_mes = df_leads.groupby('Dia').agg({'id': 'nunique'}).reset_index()
-groupby_leads_por_store = df_leads.groupby('store').agg({'id': 'nunique'}).reset_index()
-groupby_leads_por_source = df_leads.groupby('source').agg({'id': 'nunique'}).reset_index()
-groupby_leads_por_status_apnt = df_leads.groupby('status_apnt').agg({'id': 'nunique'}).reset_index()
+groupby_leads_dia_do_mes = filtered_data.groupby('Dia').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_store = filtered_data.groupby('store').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_source = filtered_data.groupby('source').agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_status_apnt = filtered_data.groupby('status_apnt').agg({'id': 'nunique'}).reset_index()
 
 # Tabela
-groupby_leads_por_store_dia = df_leads.groupby(['store', 'Dia']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_por_store_dia = filtered_data.groupby(['store', 'Dia']).agg({'id': 'nunique'}).reset_index()
 groupby_leads_por_store_dia_pivot = groupby_leads_por_store_dia.pivot(index='store', columns='Dia', values='id')
 groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia.pivot(index='Dia', columns='store', values='id')
 groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia_pivot_tabela.fillna(0)
@@ -66,17 +75,17 @@ groupby_leads_por_store_dia_pivot_tabela = groupby_leads_por_store_dia_pivot_tab
 sources_pagas = ['Facebook Leads', 'Google Pesquisa', 'Facebook Postlink']
 sources_org = ['Instagram', 'Facebook', 'CRM Bônus', 'Busca Orgânica', 'Acesso Direto ao Site']
 
-df_leads_pagas = df_leads.loc[df_leads['source'].isin(sources_pagas)]
-df_leads_org = df_leads.loc[df_leads['source'].isin(sources_org)]
+filtered_data_pagas = filtered_data.loc[filtered_data['source'].isin(sources_pagas)]
+filtered_data_org = filtered_data.loc[filtered_data['source'].isin(sources_org)]
 
-groupby_leads_pagos_por_store_dia = df_leads_pagas.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_pagos_por_store_dia = filtered_data_pagas.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
 groupby_leads_pagos_por_store_dia_pivot_tabela = groupby_leads_pagos_por_store_dia.pivot(index='source', columns='store', values='id')
 
-groupby_leads_orgs_por_store_dia = df_leads_org.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
+groupby_leads_orgs_por_store_dia = filtered_data_org.groupby(['store', 'source']).agg({'id': 'nunique'}).reset_index()
 groupby_leads_orgs_por_store_dia_pivot_tabela = groupby_leads_orgs_por_store_dia.pivot(index='source', columns='store', values='id')
 
-df_leads_concatenado = pd.concat([groupby_leads_pagos_por_store_dia_pivot_tabela, groupby_leads_orgs_por_store_dia_pivot_tabela], axis=0)
-df_leads_concatenado = df_leads_concatenado.fillna(0)
+filtered_data_concatenado = pd.concat([groupby_leads_pagos_por_store_dia_pivot_tabela, groupby_leads_orgs_por_store_dia_pivot_tabela], axis=0)
+filtered_data_concatenado = filtered_data_concatenado.fillna(0)
 
 
 # Dividindo a tela em duas colunas
@@ -142,7 +151,7 @@ st.plotly_chart(graph_evolucao_leads)
 
 # Mostrar a tabela pivotada
 st.write("Leads por Fonte de Marketing")
-st.dataframe(df_leads_concatenado)
+st.dataframe(filtered_data_concatenado)
 
 # Mostrar a tabela pivotada
 st.write("Leads por Loja por Dia")
@@ -150,4 +159,4 @@ st.dataframe(groupby_leads_por_store_dia_pivot_tabela)
 
 # Exibir o dataframe
 st.write("Dados brutos")
-st.write(df_leads)
+st.write(filtered_data)
