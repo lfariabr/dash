@@ -43,8 +43,6 @@ df_leads = load_data_from_gsheet()
 st.title("Leads Self Service")
 st.write("v1.0.0")
 
-st.write(df_leads)
-
 # Data Prep: Filtering
 df_leads['createdAt'] = pd.to_datetime(df_leads['createdAt']) # trata estes dados como texto
 df_leads['Dia do mês'] = df_leads['createdAt'].dt.day_name()
@@ -113,7 +111,7 @@ with col3:
         groupby_leads_por_source,
         names='source',
         values='id',
-        title='Leads por source',
+        title='Leads por Fonte',
         labels={'id': 'Leads', 'source': 'source'},
     )
     st.plotly_chart(graph_por_source)
@@ -123,7 +121,7 @@ with col4:
         groupby_leads_por_status_apnt,
         names='status_apnt',
         values='id',
-        title='Leads por status_apnt',
+        title='Leads por Status na Agenda',
         labels={'id': 'Leads', 'status_apnt': 'status_apnt'},
     )
     st.plotly_chart(graph_por_status_apnt)
@@ -136,16 +134,20 @@ graph_evolucao_leads = px.line(
     x='Dia do mês',
     y='Leads',
     color='store',  # Diferenciar as linhas por store
-    title='Evolução dos Leads por store e Dia do Mês',
+    title='Evolução dos Leads por Loja e Dia',
     labels={'Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
     markers=True
 )
 st.plotly_chart(graph_evolucao_leads)
 
 # Mostrar a tabela pivotada
-st.write("Leads por store por Dia")
+st.write("Leads por Loja por Dia")
 st.dataframe(groupby_leads_por_store_dia_pivot_tabela)
 
 # Mostrar a tabela pivotada
-st.write("Leads por sources Marketing")
+st.write("Leads por Fonte Marketing")
 st.dataframe(df_leads_concatenado)
+
+# Exibir o dataframe
+st.write("Dados brutos")
+st.write(df_leads)
