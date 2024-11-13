@@ -1,28 +1,22 @@
 
 import streamlit as st
 
-# --- PAGE SETUP ---
-graphics = st.Page(
-    "views/leads.py",
-    title="Conferir dados",
-    icon="📊",
-)
+# Configuração inicial da página
+st.set_page_config(page_title="Dashboard de Leads", layout="wide")
 
-asyncdata = st.Page(
-    "views/asyncdata.py",
-    title="Baixar dados",
-    icon="📈",
-)
+# Importação dos scripts de página após a configuração inicial
+from views import leads, asyncdata
 
-# --- NAVIGATION SETUP [WITH SECTIONS] ---
-pg = st.navigation(
-    {
-        "📁 Menu": [asyncdata, graphics],
-    }
-)
+# --- SIDEBAR SETUP ---
+st.sidebar.markdown("# 📁 Menu")
+# Criação dos botões de rádio para a navegação
+choice = st.sidebar.radio("Escolha uma página:", ['Conferir dados', 'Baixar dados'])
 
 st.sidebar.markdown("### Notas")
 st.sidebar.write("É possível fazer o download dos dados e visualizar os resultados em tempo real!")
 
-# --- RUN NAVIGATION ---
-pg.run()
+# Condicional para executar páginas específicas com base na escolha
+if choice == 'Conferir dados':
+    leads.run()
+elif choice == 'Baixar dados':
+    asyncdata.run()
