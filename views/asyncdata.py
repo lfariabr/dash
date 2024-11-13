@@ -134,7 +134,7 @@ def run():
                   },
                   'pagination': {
                       'currentPage': current_page,
-                      'perPage': 120,
+                      'perPage': 100,
                   },
               }
 
@@ -210,7 +210,7 @@ def run():
                   },
                   'pagination': {
                       'currentPage': current_page,
-                      'perPage': 120,
+                      'perPage': 100,
                   },
               }
 
@@ -308,7 +308,7 @@ def run():
                   },
                   'pagination': {
                       'currentPage': current_page,
-                      'perPage': 120,
+                      'perPage': 100,
                   }
               }
 
