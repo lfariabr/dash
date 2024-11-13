@@ -134,10 +134,10 @@ df_pivot_melted = groupby_leads_por_store_dia_pivot.reset_index().melt(id_vars=[
 graph_evolucao_leads = px.line(
     df_pivot_melted,
     x='Dia do mês',
-    y='Lead',
+    y='Leads',
     color='store',  # Diferenciar as linhas por store
     title='Evolução dos Leads por store e Dia do Mês',
-    labels={'Lead': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
+    labels={'Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
     markers=True
 )
 st.plotly_chart(graph_evolucao_leads)
