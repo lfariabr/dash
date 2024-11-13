@@ -39,24 +39,17 @@ def load_data_from_gsheet():
     data = get_as_dataframe(worksheet, evaluate_formulas=True)
     return data.dropna(how='all', axis=1)  # Limpa colunas totalmente vazias
 
-# Carregar dados
 df_leads = load_data_from_gsheet()
+st.title("Leads Self Service")
+st.write("v1.0.0")
 
-# Exibir dados
-st.title("Dados da Planilha")
 st.write(df_leads)
 
-# Trabalhando com datas
+# Data Prep: Filtering
 df_leads['createdAt'] = pd.to_datetime(df_leads['createdAt']) # trata estes dados como texto
 df_leads['Dia do mês'] = df_leads['createdAt'].dt.day_name()
-
-# Extrair o dia do mês de 'createdAt'
 df_leads['Dia'] = df_leads['createdAt'].dt.day
-
-# Deixando apenas Pró-Corpo
 lista_lojas_excluir = ['HOMA', 'PRAIA GRANDE', 'PLÁSTICA', 'CENTRAL']
-
-# Remover as lojas
 df_leads = df_leads[~df_leads['store'].isin(lista_lojas_excluir)]
 
 # Gráficos
@@ -141,10 +134,10 @@ df_pivot_melted = groupby_leads_por_store_dia_pivot.reset_index().melt(id_vars=[
 graph_evolucao_leads = px.line(
     df_pivot_melted,
     x='Dia do mês',
-    y='Número de Leads',
+    y='id',
     color='store',  # Diferenciar as linhas por store
     title='Evolução dos Leads por store e Dia do Mês',
-    labels={'Número de Leads': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
+    labels={'id': 'Número de Leads', 'Dia do mês': 'Dia do Mês'},
     markers=True
 )
 st.plotly_chart(graph_evolucao_leads)
