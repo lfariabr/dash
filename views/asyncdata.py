@@ -363,6 +363,7 @@ def run():
 
       if appointments_data:
           df_appointments = pd.DataFrame(appointments_data)
+          df_appointments = df_appointments.astype(str)
           st.write(f"Total de Agendamentos: {df_appointments.shape[0]} resultados")
           # st.write(df_appointments)
       else:
@@ -385,7 +386,7 @@ def run():
                           ]
           for col in cols_to_convert:
               df_leads[col] = df_leads[col].astype(str)
-              
+
           update_log("Todos os dados foram baixados. com sucesso")
           update_log("___")
           time.sleep(10)
@@ -419,7 +420,6 @@ def run():
               leads_results_list.append(formatted_row)
 
           df_leads = pd.DataFrame(leads_results_list)
-          st.write(df_leads.dtypes)
 
           # Convert 'customer_id' to string to avoid issues, and apply other special treatments
           df_leads['customer_id'] = df_leads['customer_id'].astype('Int64').astype(str)
