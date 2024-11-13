@@ -377,7 +377,8 @@ def run():
 
       # Função principal para tratar e processar os dados
       def process_data(df_leads, df_appointments, df_bill_charges):
-
+          # Convert 'message' column to string to avoid serialization issues
+          df_leads['message'] = df_leads['message'].astype(str)
           update_log("Todos os dados foram baixados. com sucesso")
           update_log("___")
           time.sleep(10)
@@ -391,32 +392,26 @@ def run():
           leads_results_list = []
           for index, lead in df_leads.iterrows():
               formatted_row = {
-                  'createdAt': str(lead['createdAt']),
-                  'id': str(lead['id']),
-                  'source': str(lead['source']['title']),
-                  'store': str(lead['store']['name']) if lead['store'] else 'None',
-                  'status': str(lead['status']['label']),
-                  'name': str(lead['name']),
-                  'telephone': str(lead['telephone']),
-                  'email': str(lead['email']),
-                  'utmMedium': str(lead['utmMedium']),
-                  'utmCampaign': str(lead['utmCampaign']),
-                  'utmContent': str(lead['utmContent']),
-                  'utmSearch': str(lead['utmSearch']),
-                  'utmTerm': str(lead['utmTerm']),
-                  'message': str(lead['message']),
-                  'customer_id': str(lead['customer']['id']) if lead['customer'] else 'None',
-                  'customer_name': str(lead['customer']['name']) if lead['customer'] else 'None',
+                  'createdAt': lead['createdAt'],
+                  'id': lead['id'],
+                  'source': lead['source']['title'],
+                  'store': lead['store']['name'] if lead['store'] else None,
+                  'status': lead['status']['label'],
+                  'name': lead['name'],
+                  'telephone': lead['telephone'],
+                  'email': lead['email'],
+                  'utmMedium': lead['utmMedium'],
+                  'utmCampaign': lead['utmCampaign'],
+                  'utmContent': lead['utmContent'],
+                  'utmSearch': lead['utmSearch'],
+                  'utmTerm': lead['utmTerm'],
+                  'message': lead['message'],
+                  'customer_id': lead['customer']['id'] if lead['customer'] else None,
+                  'customer_name': lead['customer']['name'] if lead['customer'] else None,
               }
               leads_results_list.append(formatted_row)
 
           df_leads = pd.DataFrame(leads_results_list)
-          
-          # Convert all columns to string to ensure no mixed types issues
-          df_leads = df_leads.astype(str)
-
-          # Check the data types of all columns
-          print(df_leads.dtypes)
 
           # Tratamentos especiais para leads
           df_leads.loc[df_leads['customer_id'].isna(), 'customer_id'] = "Not found"
