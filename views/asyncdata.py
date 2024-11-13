@@ -378,7 +378,14 @@ def run():
       # Função principal para tratar e processar os dados
       def process_data(df_leads, df_appointments, df_bill_charges):
           # Convert 'message' column to string to avoid serialization issues
-          df_leads['message'] = df_leads['message'].astype(str)
+          # Convert 'message' column and other necessary columns to string to avoid serialization issues
+          cols_to_convert = ['createdAt', 'source', 'store', 'status', 'name', 
+                             'telephone', 'email', 'utmMedium', 'utmCampaign', 
+                             'utmContent', 'utmSearch', 'utmTerm', 'message'
+                          ]
+          for col in cols_to_convert:
+              df_leads[col] = df_leads[col].astype(str)
+              
           update_log("Todos os dados foram baixados. com sucesso")
           update_log("___")
           time.sleep(10)
@@ -413,6 +420,10 @@ def run():
 
           df_leads = pd.DataFrame(leads_results_list)
           st.write(df_leads.dtypes)
+
+          # Convert 'customer_id' to string to avoid issues, and apply other special treatments
+          df_leads['customer_id'] = df_leads['customer_id'].astype('Int64').astype(str)
+
 
           # Tratamentos especiais para leads
           df_leads.loc[df_leads['customer_id'].isna(), 'customer_id'] = "Not found"
