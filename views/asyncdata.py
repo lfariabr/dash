@@ -362,8 +362,16 @@ def run():
           update_log("No leads data fetched or an error occurred during the fetch.")
 
       if appointments_data:
-          df_appointments = pd.DataFrame(appointments_data)
-          df_appointments = df_appointments.astype(str)
+          # Substituindo valores nulos por 'NA' nas colunas relevantes
+          cols_to_convert_appointments = ['status_label', 'store_name', 'customer_id', 'customer_name', 'customer_telephone', 
+                                          'procedure_name', 'procedure_group', 'employee_name', 'createdBy_name', 
+                                          'createdBy_createdAt', 'startDate']
+          
+          df_appointments[cols_to_convert_appointments] = df_appointments[cols_to_convert_appointments].fillna('NA')
+          df_appointments[cols_to_convert_appointments] = df_appointments[cols_to_convert_appointments].astype(str)
+          
+          # Garantir que customer_id seja tratado corretamente
+          df_appointments['customer_id'] = df_appointments['customer_id'].fillna('NA').astype(str)
           st.write(f"Total de Agendamentos: {df_appointments.shape[0]} resultados")
           # st.write(df_appointments)
       else:
