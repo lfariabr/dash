@@ -10,7 +10,7 @@ import time
 nest_asyncio.apply()
 
 # Define the Streamlit page
-st.title("Leads S.S. - Downloading")
+st.title("Leads S.S. - Download")
 st.write("v3.0.0")
 
 def run():
@@ -378,14 +378,17 @@ def run():
 
       # Função principal para tratar e processar os dados
       def process_data(df_leads, df_appointments, df_bill_charges):
-          # Convert 'message' column to string to avoid serialization issues
-          # Convert 'message' column and other necessary columns to string to avoid serialization issues
-          cols_to_convert = ['createdAt', 'source', 'store', 'status', 'name', 
-                             'telephone', 'email', 'utmMedium', 'utmCampaign', 
+          cols_to_convert = ['createdAt', 'source', 'store', 'status', 'name',
+                             'telephone', 'email', 'utmMedium', 'utmCampaign',
                              'utmContent', 'utmSearch', 'utmTerm', 'message'
                           ]
-          for col in cols_to_convert:
-              df_leads[col] = df_leads[col].astype(str)
+          
+          # First, handle missing or NaN values by replacing them with a placeholder
+          df_leads[cols_to_convert] = df_leads[cols_to_convert].fillna('NA')
+          # Convert the necessary columns to string
+          df_leads[cols_to_convert] = df_leads[cols_to_convert].astype(str)
+          # Also convert 'customer_id' to string to avoid any issues with numeric types
+          df_leads['customer_id'] = df_leads['customer_id'].astype(str)
 
           update_log("Todos os dados foram baixados. com sucesso")
           update_log("___")
