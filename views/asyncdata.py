@@ -1,4 +1,3 @@
-
 import streamlit as st
 from datetime import datetime, timedelta
 import pandas as pd
@@ -134,7 +133,7 @@ def run():
                   },
                   'pagination': {
                       'currentPage': current_page,
-                      'perPage': 100,
+                      'perPage': 80,
                   },
               }
 
@@ -211,7 +210,7 @@ def run():
                   'pagination': {
                       'currentPage': current_page,
                       'perPage': 100,
-                  },
+                  }
               }
 
               data = await fetch_graphql(session, 'https://open-api.eprocorpo.com.br/graphql', query, variables, token)
@@ -356,12 +355,14 @@ def run():
       # Exibir os dados obtidos no Streamlit
       if leads_data:
           df_leads = pd.DataFrame(leads_data)
-          st.write(f"Total de Leads: {df_leads.shape[0]} resultados")
-          # st.write(df_leads)
+          st.success(f"✅ Total de Leads: {df_leads.shape[0]} resultados")
       else:
-          update_log("No leads data fetched or an error occurred during the fetch.")
+          update_log("❌ Nenhum lead encontrado ou ocorreu um erro durante a busca.")
 
       if appointments_data:
+          # Create DataFrame first
+          df_appointments = pd.DataFrame(appointments_data)
+          
           # Substituindo valores nulos por 'NA' nas colunas relevantes
           cols_to_convert_appointments = ['status_label', 'store_name', 'customer_id', 'customer_name', 'customer_telephone', 
                                           'procedure_name', 'procedure_group', 'employee_name', 'createdBy_name', 
@@ -370,33 +371,35 @@ def run():
           df_appointments[cols_to_convert_appointments] = df_appointments[cols_to_convert_appointments].fillna('NA')
           df_appointments[cols_to_convert_appointments] = df_appointments[cols_to_convert_appointments].astype(str)
           
-          # Garantir que customer_id seja tratado corretamente
-          df_appointments['customer_id'] = df_appointments['customer_id'].fillna('NA').astype(str)
-          st.write(f"Total de Agendamentos: {df_appointments.shape[0]} resultados")
-          # st.write(df_appointments)
+          st.success(f"✅ Total de Agendamentos: {df_appointments.shape[0]} resultados")
       else:
-          update_log("No appointments data fetched or an error occurred during the fetch.")
+          update_log("❌ Nenhum agendamento encontrado ou ocorreu um erro durante a busca.")
 
       if bill_charges_data:
           df_bill_charges = pd.DataFrame(bill_charges_data)
-          st.write(f"Total de Vendas: {df_bill_charges.shape[0]} resultados")
-          # st.write(df_bill_charges)
+          st.success(f"✅ Total de Vendas: {df_bill_charges.shape[0]} resultados")
       else:
-          update_log("No bill charges data fetched or an error occurred during the fetch.")
+          update_log("❌ Nenhuma venda encontrada ou ocorreu um erro durante a busca.")
 
       # Função principal para tratar e processar os dados
       def process_data(df_leads, df_appointments, df_bill_charges):
+          # Extract nested fields from leads data
+          df_leads['source'] = df_leads['source'].apply(lambda x: x.get('title') if x else 'NA')
+          df_leads['store'] = df_leads['store'].apply(lambda x: x.get('name') if x else 'NA')
+          df_leads['status'] = df_leads['status'].apply(lambda x: x.get('label') if x else 'NA')
+          df_leads['customer_id'] = df_leads['customer'].apply(lambda x: x.get('id') if x else 'NA')
+          df_leads['customer_name'] = df_leads['customer'].apply(lambda x: x.get('name') if x else 'NA')
+          
           cols_to_convert = ['createdAt', 'source', 'store', 'status', 'name',
-                             'telephone', 'email', 'utmMedium', 'utmCampaign',
-                             'utmContent', 'utmSearch', 'utmTerm', 'message'
+                           'telephone', 'email', 'utmMedium', 'utmCampaign',
+                           'utmContent', 'utmSearch', 'utmTerm', 'message',
+                           'customer_id', 'customer_name'
                           ]
           
           # First, handle missing or NaN values by replacing them with a placeholder
           df_leads[cols_to_convert] = df_leads[cols_to_convert].fillna('NA')
           # Convert the necessary columns to string
           df_leads[cols_to_convert] = df_leads[cols_to_convert].astype(str)
-          # Also convert 'customer_id' to string to avoid any issues with numeric types
-          df_leads['customer_id'] = df_leads['customer_id'].astype(str)
 
           update_log("Todos os dados foram baixados. com sucesso")
           update_log("___")
@@ -413,9 +416,9 @@ def run():
               formatted_row = {
                   'createdAt': lead['createdAt'],
                   'id': lead['id'],
-                  'source': lead['source']['title'],
-                  'store': lead['store']['name'] if lead['store'] else None,
-                  'status': lead['status']['label'],
+                  'source': lead['source'],
+                  'store': lead['store'],
+                  'status': lead['status'],
                   'name': lead['name'],
                   'telephone': lead['telephone'],
                   'email': lead['email'],
@@ -425,25 +428,25 @@ def run():
                   'utmSearch': lead['utmSearch'],
                   'utmTerm': lead['utmTerm'],
                   'message': lead['message'],
-                  'customer_id': lead['customer']['id'] if lead['customer'] else None,
-                  'customer_name': lead['customer']['name'] if lead['customer'] else None,
+                  'customer_id': lead['customer_id'],
+                  'customer_name': lead['customer_name'],
               }
               leads_results_list.append(formatted_row)
 
           df_leads = pd.DataFrame(leads_results_list)
 
-          # Convert 'customer_id' to string to avoid issues, and apply other special treatments
-          df_leads['customer_id'] = df_leads['customer_id'].astype('Int64').astype(str)
-
+          # Handle customer_id conversion properly
+          df_leads['customer_id'] = df_leads['customer_id'].replace('NA', pd.NA)  # Replace 'NA' string with pandas NA
+          df_leads['customer_id'] = pd.to_numeric(df_leads['customer_id'], errors='coerce')  # Convert to numeric, invalid values become NaN
+          df_leads['customer_id'] = df_leads['customer_id'].astype('Int64')  # Convert to nullable integer type
 
           # Tratamentos especiais para leads
-          df_leads.loc[df_leads['customer_id'].isna(), 'customer_id'] = "Not found"
+          df_leads.loc[df_leads['customer_id'].isna(), 'customer_id'] = pd.NA  # Use pandas NA for missing values
           df_leads = df_leads[~df_leads['store'].isin(["CENTRAL", "HOMA", "PLÁSTICA", "PRAIA GRANDE"])]
-          df_leads['is_customer'] = df_leads['customer_id'].apply(lambda x: "True" if x != "Not found" else "False")
+          df_leads['is_customer'] = df_leads['customer_id'].notna().map({True: "True", False: "False"})
           df_leads['is_appointment'] = False
           df_leads['is_served'] = False
           df_leads['is_purchase'] = False
-          df_leads['customer_id'] = pd.to_numeric(df_leads['customer_id'], errors='coerce').astype('Int64')
 
           df_leads_is_appointment = df_leads[df_leads['is_customer'] == 'True']
 
@@ -702,3 +705,6 @@ def run():
 
       except Exception as e:
         st.error(f"Failed to save data to Google Sheets: {e}")
+
+if __name__ == "__main__":
+    run()
